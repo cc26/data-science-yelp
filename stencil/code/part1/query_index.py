@@ -1,12 +1,24 @@
 import sys
 import argparse
 import json
-
+from sets import Set
 inverted_index = {}
 
 def one_word_query(line):
 	print"one_word_query:",line
 
+	if line not in inverted_index:
+		print "term not found"
+		return []
+	result = Set()
+	list_values = inverted_index[line]
+	for ele in list_values:
+		result.add(ele['b_id'])
+
+	result = list(result)
+
+	print result
+	return result
 
 
 def free_text_query(line):
@@ -35,6 +47,7 @@ def main():
 
 	# TODO: need to check error input  
 	for line in sys.stdin:
+		line = line.strip('\n')
 		f_type = len(line.split())
 		if f_type == 1:
 			one_word_query(line)
