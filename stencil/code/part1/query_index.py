@@ -10,9 +10,51 @@ def one_word_query(line):
 
 
 def free_text_query(line):
-	print "free_text_query:",line
+	words = line.split()
+	result = []
+	for ele in inverted_index[words[0]]:
+		if ele['b_id'] not in result:
+			result.append(ele['b_id'])
+	for word in words[1:len(words)]:
+		if len(result) == 0: break
+		tmp = inverted_index[word]
+		rem = []
+		for i, bid in result:
+			flag = 0
+			for term in tmp:
+				if bid == term['b_id']:
+					flag = 1
+					break
+			if flag == 0: rem.append(result[i])
+		for ele in rem:
+			result.remove(ele)
+	return result
+
 def phrase_query(line):
-	print "phrase_query:",line
+	line = line.stript('"')
+	words = line.split()
+	result = []
+	business = []
+	for ele in inverted_index[words[0]]:
+		if ele['b_id'] not in business:
+			business.append(ele['b_id'])
+			result.append(ele)
+	for word in words[1:len(words)]:
+		if len(result) == 0: break
+		tmp = inverted_index[word]
+		rem = []
+		for i, dic in result:
+			flag = 0
+			for term in tmp:
+				if (dic['b_id'] == term['b_id'] and dic['r_id'] <= term['r_id'] and dic['idx'] <= term['idx']):
+					result[i] = term
+					flag = 1
+					break
+			if flag == 0: rem.append(result[i])
+		for ele in rem:
+			result.remove(ele)
+			business.remove(ele['b_id'])
+	return business
 
 def load_file(data):
 
