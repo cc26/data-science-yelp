@@ -17,7 +17,7 @@ def create_index(data, stop_words):
 		line_json = json.loads(line)
 		create_entry(line_json, idx, term_map, stop_words)
 		idx += 1
-		if idx == 3000:
+		if idx == 1000:
 			break
 	return term_map
 
@@ -55,20 +55,21 @@ def load_stop_words():
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-input', required=True, help='Path to input data')
-	parser.add_argument('-output', required=True, help='Path to output data')
+	# parser.add_argument('-output', required=True, help='Path to output data')
 
 	opts = parser.parse_args()
 
 	stopwords = load_stop_words()
-	print stopwords
+
 	data = open(opts.input)
 	inv_idx = create_index(data, stopwords)
 
 	data.close()
 
-	output = open(opts.output,'w')
-	for key in inv_idx:
-		output.write(str(key.encode('utf-8'))+" "+str(inv_idx[key])+"\n")
-	output.close()
+	print json.dumps(inv_idx)
+	# output = open(opts.output,'w')
+	# for key in inv_idx:
+	# 	output.write(str(key.encode('utf-8'))+":"+str(inv_idx[key])+"\n")
+	# output.close()
 if __name__ == '__main__':
 	main()
