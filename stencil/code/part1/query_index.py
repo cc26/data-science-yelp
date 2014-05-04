@@ -20,7 +20,7 @@ def load_file(data):
 
 	for line in data:
 		inverted_index[line] = data[line]
-	
+		
 	print "finish loading data"
 
 def main():

@@ -33,9 +33,9 @@ def create_entry(line, line_number, term_map, stop_words):
 		if term =='': 
 			continue
 		if term in term_map:
-			term_map[term].append((r_id, b_id, i))
+			term_map[term].append({"r_id":r_id,"b_id": b_id,"idx": i})
 		else:
-			term_map[term] = [(r_id, b_id, i)]
+			term_map[term] = [{"r_id":r_id,"b_id": b_id,"idx": i}]
 
 def term_rp_process(term):
 	
