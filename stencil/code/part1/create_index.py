@@ -1,6 +1,8 @@
 import argparse
 import json 
 import re
+import porter_stemmer
+
 # retrieve a list of postings containing a 
 # business id, review id, and position of each term occurrence. 
 # instead of using the review id, 
@@ -15,7 +17,7 @@ def create_index(data, stop_words):
 		line_json = json.loads(line)
 		create_entry(line_json, idx, term_map, stop_words)
 		idx += 1
-		if idx == 1000:
+		if idx == 3000:
 			break
 	return term_map
 
@@ -31,7 +33,7 @@ def create_entry(line, line_number, term_map, stop_words):
 		if term =='': 
 			continue
 		if term in term_map:
-			term_map[term] += (r_id, b_id, i)
+			term_map[term].append((r_id, b_id, i))
 		else:
 			term_map[term] = [(r_id, b_id, i)]
 
@@ -39,6 +41,7 @@ def term_rp_process(term):
 	
 	term = re.sub(r'[^\w\s]','',term)
 	term = re.sub('[^\x20-\x7E]*','',term)
+	term = porter_stemmer.PorterStemmer().stem(term, 0,len(term)-1).encode('utf-8')
 	return term.lower()
 
 
