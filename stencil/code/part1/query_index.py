@@ -31,7 +31,7 @@ def free_text_query(line):
 		if len(result) == 0: break
 		tmp = inverted_index[word]
 		rem = []
-		for i, bid in result:
+		for i, bid in enumerate(result):
 			flag = 0
 			for term in tmp:
 				if bid == term['b_id']:
@@ -40,10 +40,11 @@ def free_text_query(line):
 			if flag == 0: rem.append(result[i])
 		for ele in rem:
 			result.remove(ele)
+        print result
 	return result
 
 def phrase_query(line):
-	line = line.stript('"')
+	line = line.strip('"')
 	words = line.split()
 	result = []
 	business = []
@@ -55,7 +56,7 @@ def phrase_query(line):
 		if len(result) == 0: break
 		tmp = inverted_index[word]
 		rem = []
-		for i, dic in result:
+		for i, dic in enumerate(result):
 			flag = 0
 			for term in tmp:
 				if (dic['b_id'] == term['b_id'] and dic['r_id'] <= term['r_id'] and dic['idx'] <= term['idx']):
@@ -66,6 +67,7 @@ def phrase_query(line):
 		for ele in rem:
 			result.remove(ele)
 			business.remove(ele['b_id'])
+	print business
 	return business
 
 def load_file(data):
