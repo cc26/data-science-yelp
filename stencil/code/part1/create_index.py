@@ -17,8 +17,6 @@ def create_index(data, stop_words):
 		line_json = json.loads(line)
 		create_entry(line_json, idx, term_map, stop_words)
 		idx += 1
-		if idx == 1000:
-			break
 	return term_map
 
 def create_entry(line, line_number, term_map, stop_words):
