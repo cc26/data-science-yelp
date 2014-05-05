@@ -33,9 +33,15 @@ def create_entry(line, line_number, term_map, stop_words):
 		if term =='': 
 			continue
 		if term in term_map:
-			term_map[term].append({"r_id":r_id,"b_id": b_id,"idx": i})
+			same_line = False
+			for ele in term_map[term]:
+				if ele['r_id'] == r_id:
+					ele['idx'].append(i)
+					same_line = True
+			if not same_line:
+				term_map[term].append({"r_id":r_id,"b_id": b_id,"idx": [i]})
 		else:
-			term_map[term] = [{"r_id":r_id,"b_id": b_id,"idx": i}]
+			term_map[term] = [{"r_id":r_id,"b_id": b_id,"idx": [i]}]
 
 def term_rp_process(term):
 	
@@ -65,7 +71,6 @@ def main():
 	inv_idx = create_index(data, stopwords)
 
 	data.close()
-
 	print json.dumps(inv_idx)
 	# output = open(opts.output,'w')
 	# for key in inv_idx:
