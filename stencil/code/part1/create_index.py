@@ -1,80 +1,46 @@
 import argparse
-import json 
-import re
-import porter_stemmer
-
-# retrieve a list of postings containing a 
-# business id, review id, and position of each term occurrence. 
-# instead of using the review id, 
-# use the line on which the review occurs in the yelp dataset file as a unique identifier
-
-
-def create_index(data, stop_words):
-
-	idx = 0
-	term_map = {}
-	for line in data:
-		line_json = json.loads(line)
-		create_entry(line_json, idx, term_map, stop_words)
-		idx += 1
-		print idx
-	return term_map
-
-def create_entry(line, line_number, term_map, stop_words):
-	entry = {}
-	b_id = line['business_id']
-	r_id = line_number
-	text = line['text'].split()
-	for i in range(0, len(text)):	
-		term = term_rp_process(text[i])
-		if term in stop_words: 
-			continue
-		if term =='': 
-			continue
-		if term in term_map:
-			same_line = False
-			for ele in term_map[term]:
-				if ele['r_id'] == r_id:
-					ele['idx'].append(i)
-					same_line = True
-			if not same_line:
-				term_map[term].append({"r_id":r_id,"b_id": b_id,"idx": [i]})
-		else:
-			term_map[term] = [{"r_id":r_id,"b_id": b_id,"idx": [i]}]
-
-def term_rp_process(term):
-	
-	term = re.sub(r'[^\w\s]','',term)
-	term = re.sub('[^\x20-\x7E]*','',term)
-	term = porter_stemmer.PorterStemmer().stem(term, 0,len(term)-1).encode('utf-8')
-	return term.lower()
-
-
-def load_stop_words():
-	stop_words_file = open('./stopwords.txt')
-	stop_words = []
-	for ele in stop_words_file:
-		stop_words += [ele.strip('\n')]
-	return stop_words
+import json
+from tokenizer import Tokenizer
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-input', required=True, help='Path to input data')
-	# parser.add_argument('-output', required=True, help='Path to output data')
-
+	parser.add_argument('-review_file', required=True, help='Path to review data')
+	parser.add_argument('-business_file', required=True, help='Path to business data')
+	parser.add_argument('-output', required=True, help='Path to output index file')
 	opts = parser.parse_args()
+	f_reviews = open(opts.review_file,'r')
+	f_business = open(opts.business_file,'r')
 
-	stopwords = load_stop_words()
 
-	data = open(opts.input)
-	inv_idx = create_index(data, stopwords)
+	tokenizer = Tokenizer()
+	wordsmap = {}
+	line_num = 0
+	for line in f_reviews:
+		r = json.loads(line)
+		words = tokenizer.process_review(r['text']);
+		w_idx = 0
+		for w in words:
+			if w=="":
+				continue
+			b_id = r['business_id']
+			if b_id in wordsmap:
+				b_map = wordsmap[b_id]
+				if line_num in b_map:
+					b_map[line_num].append(w_idx)
+				else:
+					b_map[line_num] = [w_idx]
+			else:
+				wordsmap[b_id] = {line_num:[w_idx]}
 
-	data.close()
-	with open('test_1.json', 'w') as outfile:
-		json.dump(inv_idx, outfile)
-	# output = open(opts.output,'w')
-	# for key in inv_idx:
-	# 	output.write(str(key.encode('utf-8'))+":"+str(inv_idx[key])+"\n")
-	# output.close()
+			w_idx += 1
+		line_num += 1
+		if line_num % 1000==0:
+			print line_num 
+		if line_num==10000:
+			break
+
+	with open(opts.output, 'w') as f_out:
+		json.dump(wordsmap, f_out)
+
 if __name__ == '__main__':
 	main()
