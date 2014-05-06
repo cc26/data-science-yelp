@@ -1,1 +1,1 @@
-python create_index.py -input ./yelp_academic_dataset_review.json
+python create_index.py -input /course/pub/final/data/extracted/yelp_academic_dataset_review.json

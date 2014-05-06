@@ -17,6 +17,7 @@ def create_index(data, stop_words):
 		line_json = json.loads(line)
 		create_entry(line_json, idx, term_map, stop_words)
 		idx += 1
+		print idx
 	return term_map
 
 def create_entry(line, line_number, term_map, stop_words):
@@ -69,7 +70,8 @@ def main():
 	inv_idx = create_index(data, stopwords)
 
 	data.close()
-	print json.dumps(inv_idx)
+	with open('test_1.json', 'w') as outfile:
+		json.dump(inv_idx, outfile)
 	# output = open(opts.output,'w')
 	# for key in inv_idx:
 	# 	output.write(str(key.encode('utf-8'))+":"+str(inv_idx[key])+"\n")
