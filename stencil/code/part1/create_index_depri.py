@@ -28,8 +28,6 @@ def create_index(data):
 				term_map[term] = [(r_id,b_id,i)]		
 
 		idx += 1
-		if idx == 10000:
-			break
 		print idx
 	return term_map
 
@@ -58,12 +56,18 @@ def main():
 	create_index(data)
 
 	data.close()
+<<<<<<< HEAD:stencil/code/part1/create_index_depri.py
 
 
 	with open('short_output.json', 'w') as outfile:
 		json.dump(term_map, outfile)	
 
     # output = open(opts.output,'w')
+=======
+	with open('test_1.json', 'w') as outfile:
+		json.dump(inv_idx, outfile)
+	# output = open(opts.output,'w')
+>>>>>>> b309d48b8bce4513f546be955b39c6431c6197a8:stencil/code/part1/create_index.py
 	# for key in inv_idx:
 	# 	output.write(str(key.encode('utf-8'))+":"+str(inv_idx[key])+"\n")
 	# output.close()
