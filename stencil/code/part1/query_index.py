@@ -13,7 +13,7 @@ def one_word_query(line):
 	result = Set()
 	list_values = inverted_index[line]
 	for ele in list_values:
-		result.add(ele['b_id'])
+		result.add(ele[1])
 
 	result = list(result)
 
@@ -25,8 +25,8 @@ def free_text_query(line):
 	words = line.split()
 	result = []
 	for ele in inverted_index[words[0]]:
-		if ele['b_id'] not in result:
-			result.append(ele['b_id'])
+		if ele[1] not in result:
+			result.append(ele[1])
 	for word in words[1:len(words)]:
 		if len(result) == 0: break
 		tmp = inverted_index[word]
@@ -34,7 +34,7 @@ def free_text_query(line):
 		for i, bid in enumerate(result):
 			flag = 0
 			for term in tmp:
-				if bid == term['b_id']:
+				if bid == term[1]:
 					flag = 1
 					break
 			if flag == 0: rem.append(result[i])
@@ -49,8 +49,8 @@ def phrase_query(line):
 	result = []
 	business = []
 	for ele in inverted_index[words[0]]:
-		if ele['b_id'] not in business:
-			business.append(ele['b_id'])
+		if ele[1] not in business:
+			business.append(ele[1])
 			result.append(ele)
 	for word in words[1:len(words)]:
 		if len(result) == 0: break
@@ -59,24 +59,25 @@ def phrase_query(line):
 		for i, dic in enumerate(result):
 			flag = 0
 			for term in tmp:
-				if (dic['b_id'] == term['b_id'] and dic['r_id'] <= term['r_id'] and dic['idx'] <= term['idx']):
+				if (dic[1] == term[1] and dic[0] <= term[0] and dic[2] <= term[2]):
 					result[i] = term
 					flag = 1
 					break
 			if flag == 0: rem.append(result[i])
 		for ele in rem:
 			result.remove(ele)
-			business.remove(ele['b_id'])
+			business.remove(ele[1])
 	print business
 	return business
 
 def load_file(data):
 
 	print "loading file"
-
+	idx = 0
 	for line in data:
 		inverted_index[line] = data[line]
-		
+		idx+=1 
+		print idx
 	print "finish loading data"
 
 def main():
