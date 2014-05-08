@@ -10,9 +10,10 @@ def main():
 	count = 0
 	for line in f_business:
 		line = json.loads(line)
+		print line['attributes']
 		if line['review_count'] >= 5:
 			count += 1 
-	print count
+	
 
 if __name__ == '__main__':
 	main()

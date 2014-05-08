@@ -1,5 +1,26 @@
 <html>
 
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+text {
+  font: 13px sans-serif;
+}
+
+form {
+  right: 10px;
+  top: 10px;
+}
+
+
+</style>
+
 <head>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +33,156 @@
         <div class="col-md-2"></div>
         <div class="col-md-8">
             <div class="page-header center">
-                <h1></h1>
+                <h1>Final Project</h1>
             </div>
 
-            <!--  
-            <h2></h2>
+            <h2>Motivation</h2>
 			<p>
+                The rapid development of Internet and mobile technology has brought people new ways to explore their neighbourhoods. In the old days, people use yellow books or ask around to find interesting businesses around them -- businesses changes over time, so these methods are not quite efficient. Nowadays, when people arrive at a new place, they search on the Internet to find out what are the most interesting and popular business around. For a business, it becomes increasingly important to build up their <b>Internet Popularity</b>. 
 
+                Our project intend to explore the relationship between a business's Internet popularity and the features this business has. 
 			</p>
-			-->
+            <h2>Problem</h2>
+            <p>
+                When we use yelp, we normally search and sort by the average stars. We might as well look at the review count as a reference in order to guarantee that we have enough samples to support the average stars. However what we don't know is "Is this enough?", are there more factors that we should take into account?
+
+                With that in mind, we therefore a peek take into the yelp's business data as the picture as following:
+
+            </p>
+          
+            <div id = "chart"> 
+                 <form>
+              <label><input type="radio" name="dataset" value="waiter" checked> waiter?</label>
+              <label><input type="radio" name="dataset" value="wheelchair"> wheelchair?</label>
+             <label><input type="radio" name="dataset" value="delivery"> delivery?</label>
+              <label><input type="radio" name="dataset" value="credit_card"> credit card?</label>
+
+            </form>
+            </div>
+			
+            <div>
+                
+                The data for the pie chart is taken from the yelp's business data whos average start is greater than 4, and the review count is greater than 10, we call them successful business just for now. 
+                The dark color means true, and the light color means false. 
+                We say that for most successful business has waiter service, provides credit card service, wheelchair service and do not provide delivery. 
+
+                In light of this, we first define our so called "successful business" based on the average star and total review count.
+                Using this information as our training data, we use the other features to do the cross reference test. For example: review, 
+                attributes(parking, good for dinner? lunch? desert?, atmosphere, tv etc.), we use those features to see if this features can represent the success of the businesses. 
+            </div>
+
+            <h2>Hypothesis</h2>
+
+            <h2>Methodology and Implementation Details</h2>
+            <p>
+                a. Data Cleaning:
+                In this step, we extract the data that we need form the yelp dataset, and using this data to make our training data. In our trainging data, we label 1 as successful, 0 as not successful.  
+            </p>
+
+            <p>
+                b. Feature extraction
+                We will normalize the texts, extract all the features we need for the machine learning model.
+                In this part we extract the reviews, parking, outdoor seating, price range, good for(dinner, lunch, dessert), ambience, takes reservations, wifi, wheelchair service. 
+
+                In order to use all those features to our classifier, we transform our features for example: if outdoor seating is provided, price range is 1, good for dinner, we will transform it to a string: "OUTDOOR_SEATING_PROVIDED PRICE_RANGE_1 GOOD_FOR_DINNER", append all these features together and let the vectorizer to handle the feature space transform.
+            </p>
+            <p>
+                c. Model Training and Classification
+                After we have the features ready, we will feed the data to models and choose and tweak machine learning models, and see which one gives us the best result. We will perform cross validation, and make predictions on some testing data.
+                We will use three classifiers: Naive Bayse, Logistic, SVM  
+            </p>
+            <p>
+                d. Visiualization
+                We use d3 to visiualize our result. 
+            </p>
+
+            <h2>Result</h2>
 
         <div class="col-md-2"></div>
     </div>
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
 
+var width = 300,
+    height = 400,
+    radius = Math.min(width, height) / 2;
+
+var color = d3.scale.category20();
+
+var pie = d3.layout.pie()
+    .value(function(d) { return d.waiter; })
+    .sort(null);
+
+var arc = d3.svg.arc()
+    .outerRadius(radius - 20);
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+
+
+d3.tsv("data.tsv", type, function(error, data) {
+  var path = svg.datum(data).selectAll("path")
+      .data(pie)
+    .enter().append("path")
+      .attr("fill", function(d, i) { return color(i); })
+      .attr("d", arc)
+      .each(function(d) { this._current = d; }); // store the initial angles
+
+  // var text = svg.datum(data).selectAll("text")
+  //   .data(pie);
+  //   text.enter()
+  //   .append("text")
+  //   .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+  //   .attr("dy", ".65em")
+  //   .text(function(d) {
+  //     return d['value'];
+  //   });
+
+  d3.selectAll("input")
+      .on("change", change);
+
+  // var timeout = setTimeout(function() {
+    d3.select("input[value=\"\"]").property("checked", true).each(change);
+  // }, 5000);
+
+
+  function change() {
+    var value = this.value;
+    // clearTimeout(timeout);
+    pie.value(function(d) { 
+    return d[value]; }); // change the value function
+    path = path.data(pie); // compute the new angles
+    path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
+
+  }
+
+
+
+});
+
+function arcTween(a) {
+  var i = d3.interpolate(this._current, a);
+  this._current = i(0);
+  return function(t) {
+    return arc(i(t));
+  };
+}
+
+
+function type(d) {
+  d.waiter = +d.waiter;
+  d.wheelchair = +d.wheelchair;
+  d.delivery = +d.delivery;
+  d.credit_card = +d.credit_card;
+  return d;
+}
+
+</script>
 </body>
 </html>
 
