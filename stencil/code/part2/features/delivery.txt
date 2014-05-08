@@ -1,0 +1,3 @@
+Total delivery 1428
+True is 222
+False is 1206

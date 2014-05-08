@@ -1,0 +1,4 @@
+Total wifi 1397
+No wifi 784
+Paid wifi 25
+Free wifi 588

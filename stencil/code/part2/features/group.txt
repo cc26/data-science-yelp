@@ -1,0 +1,3 @@
+Total group 1549
+True is 1371
+False is 178
