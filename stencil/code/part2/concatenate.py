@@ -11,12 +11,19 @@ def main():
 	parser.add_argument('-train_file', required=True, help='Path to train file')
 	parser.add_argument('-test_file', required=True, help='Path to test file')
 	parser.add_argument('-business_file', required=True, help='Path to business file')
+        parser.add_argument('-sentiment_file', required=True, help='Path to sentiment file')
 	opts = parser.parse_args()
 	# f_reviews = open(opts.review_file,'r')
 	f_review = open(opts.review_file,'r')
 	f_train = open(opts.train_file, 'r')
 	f_test = open(opts.test_file, 'r')
-	f_business = open(opts.business_file, 'r')    
+	f_business = open(opts.business_file, 'r')
+
+	sent_file = open(opts.sentiment_file, 'r')
+	scores = {}
+	for line in sent_file:
+		term, score = line.split("\t")
+		scores[term] = float(score)
 	
 	business_dic = {}
 	
@@ -40,11 +47,35 @@ def main():
 		if line['business_id'] not in business:
 			business[line['business_id']] = {}
 			business[line['business_id']]['label'] = label[line['business_id']]
-			# business[line['business_id']]['text'] = line['text'].encode('utf-8').replace('\n', '')
+			business[line['business_id']]['review'] = line['text'].encode('utf-8').replace('\n', '')
 			business[line['business_id']]['text'] = ""
 
-		# else:
-		 	# business[line['business_id']]['text'] = business[line['business_id']]['text'] + ' ' + line['text'].encode('utf-8').replace('\n', '')
+		else:
+		 	business[line['business_id']]['review'] = business[line['business_id']]['review'] + ' ' + line['text'].encode('utf-8').replace('\n', '')
+
+	for bid in business:
+		business[bid]['score'] = 0
+		score = 0.0
+		count = 0
+		review_text = business[bid]['review'].lower()
+		termlist = review_text.split()
+		for term in termlist:
+			if term in scores:
+				score = score + scores[term]
+				count += 1
+		if count == 0:
+			business[bid]['score'] = 0
+		else:
+			business[bid]['score'] = score/count
+
+	for bid in business:
+		if business[bid]['score'] < 1:
+			business[bid]['text'] = 'FEATURE_NEGATIVEREVIEW'
+		elif business[bid]['score'] >=1 and business[bid]['score'] < 1.5:
+			business[bid]['text'] = 'FEATURE_NEUTRALREVIEW'
+		else:
+			business[bid]['text'] = 'FEATURE_POSITIVEREVIEW'
+
 
 	for bid in business:
 		if 'Outdoor Seating' not in business_dic[bid]['attributes']:

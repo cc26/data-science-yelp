@@ -1,0 +1,19 @@
+import argparse
+import json
+
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-business_file', required=True, help='Path to business data')
+	opts = parser.parse_args()
+	# f_reviews = open(opts.review_file,'r')
+	f_business = open(opts.business_file, 'r')
+	count = 0
+	for line in f_business:
+		line = json.loads(line)
+		print line['attributes']
+		if line['review_count'] >= 5:
+			count += 1 
+	
+
+if __name__ == '__main__':
+	main()
