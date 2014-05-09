@@ -1,1 +1,1 @@
-python create_index.py -review_file /course/cs1951a/pub/final/data/extracted/yelp_academic_dataset_review.json -business_file /course/cs1951a/pub/final/data/extracted/yelp_academic_dataset_business.json -output  azu_index.json
+python create_index.py -review_file /course/cs1951a/pub/final/data/extracted/yelp_academic_dataset_review.json -business_file /course/cs1951a/pub/final/data/extracted/yelp_academic_dataset_business.json -output  /course/cs1951a/pub/final/temp/azu_index2.json

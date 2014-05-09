@@ -21,7 +21,7 @@ class Tokenizer(object):
 			stopwords.add(word.strip().lower())
 
 
-		tweet_words = tweet.split(" ")
+		tweet_words = tweet.split()
 		tweet = ""
 		for w in tweet_words:
 			if len(w)< 1 or w in stopwords:
@@ -30,6 +30,7 @@ class Tokenizer(object):
 				continue
 			else:
 				tweet+= " "+w
+		tweet = tweet.strip()
 		tweet = ''.join(ch for ch in tweet if ch not in string.punctuation)
 
 		tweet_words = [self.stemmer.stem(word, 0, len(word)-1) for word in tweet.split(" ")]
