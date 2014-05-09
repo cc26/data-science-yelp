@@ -31,6 +31,11 @@ form {
 }
 
 
+.area_pos {
+  fill: steelblue;
+}
+
+
 </style>
 
 <head>
@@ -110,7 +115,7 @@ form {
 
             <h2>Result</h2>
             <div id="chart_2"></div>
-
+            <div id="chart_3"></div>
         <div class="col-md-2"></div>
     </div>
 
@@ -261,6 +266,91 @@ function type(d) {
   d.value = +d.value;
   return d;
 }
+
+</script>
+
+
+<script>
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 700 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+
+var x2 = d3.scale.linear()
+    .range([0, width]);
+
+var y2 = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis2 = d3.svg.axis()
+    .scale(x2)
+    .orient("bottom");
+
+var yAxis2 = d3.svg.axis()
+    .scale(y2)
+    .orient("left");
+
+var area = d3.svg.area()
+    .x(function(d) { return x2(d.item); })
+    .y0(function(d) { return y2(d.low); })
+    .y1(function(d) { return y2(d.high); });
+
+var svg3 = d3.select("#chart_3").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("neg.tsv", function(error, data) {
+  data.forEach(function(d) {
+    d.item = d.item;
+    d.low = +d.low;
+    d.high = +d.high;
+  });
+
+
+  x2.domain([1, d3.max(data, function(d,i) { return i+1; })]);
+  y2.domain([0, 5000]);
+
+  svg3.append("path")
+      .datum(data)
+      .attr("class", "area_neg")
+      .attr("d", area);
+
+
+  svg3.append("g")
+      .attr("class", "y axis2")
+      .call(yAxis2)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Rent ($)");
+});
+
+
+
+d3.tsv("pos.tsv", function(error, data) {
+  data.forEach(function(d) {
+    d.item = d.item;
+    d.low = +d.low;
+    d.high = +d.high;
+  });
+
+
+  console.log( d3.max(data, function(d,i) { return i+1; }))
+  x2.domain([1, d3.max(data, function(d,i) { return i+1; })]);
+  y2.domain([0, 5000]);
+
+  svg3.append("path")
+      .datum(data)
+      .attr("class", "area_pos")
+      .attr("d", area);
+
+
+});
 
 </script>
 </body>
