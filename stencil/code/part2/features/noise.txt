@@ -1,0 +1,4 @@
+Total noise level 1470
+Quiet 303
+Average 1062
+Loud 78

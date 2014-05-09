@@ -1,0 +1,1 @@
+python concatenate.py -review_file /course/cs1951a/pub/final/data/extracted/yelp_academic_dataset_review.json -train_file train.txt -test_file test.txt -business_file /course/cs1951a/pub/final/data/extracted/yelp_academic_dataset_business.json

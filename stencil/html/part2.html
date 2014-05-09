@@ -1,5 +1,43 @@
 <html>
 
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+
+form {
+  right: 10px;
+  top: 10px;
+}
+
+.bar.positive {
+  fill: steelblue;
+}
+
+.bar.negative {
+  fill: brown;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
+.area_pos {
+  fill: steelblue;
+}
+
+
+</style>
+
 <head>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +50,309 @@
         <div class="col-md-2"></div>
         <div class="col-md-8">
             <div class="page-header center">
-                <h1></h1>
+                <h1>Final Project</h1>
             </div>
 
-            <!--  
-            <h2></h2>
+            <h2>Motivation</h2>
 			<p>
+                The rapid development of Internet and mobile technology has brought people new ways to explore their neighbourhoods. In the old days, people use yellow books or ask around to find interesting businesses around them -- businesses changes over time, so these methods are not quite efficient. Nowadays, when people arrive at a new place, they search on the Internet to find out what are the most interesting and popular business around. For a business, it becomes increasingly important to build up their <b>Internet Popularity</b>. 
 
+                Our project intend to explore the relationship between a business's Internet popularity and the features this business has. 
 			</p>
-			-->
+            <h2>Problem</h2>
+            <p>
+                When we use yelp, we normally search and sort by the average stars. We might as well look at the review count as a reference in order to guarantee that we have enough samples to support the average stars. However what we don't know is "Is this enough?", are there more factors that we should take into account?
 
+                With that in mind, we therefore a peek take into the yelp's business data as the picture as following:
+
+            </p>
+          
+            <div id = "chart"> 
+                 <form>
+              <label><input type="radio" name="dataset" value="waiter" checked> waiter?</label>
+              <label><input type="radio" name="dataset" value="wheelchair"> wheelchair?</label>
+             <label><input type="radio" name="dataset" value="delivery"> delivery?</label>
+              <label><input type="radio" name="dataset" value="credit_card"> credit card?</label>
+
+            </form>
+            </div>
+			
+            <div>
+                
+                The data for the pie chart is taken from the yelp's business data whos average start is greater than 4, and the review count is greater than 10, we call them successful business just for now. 
+                The dark color means true, and the light color means false. 
+                We say that for most successful business has waiter service, provides credit card service, wheelchair service and do not provide delivery. 
+
+                In light of this, we first define our so called "successful business" based on the average star and total review count.
+                Using this information as our training data, we use the other features to do the cross reference test. For example: review, 
+                attributes(parking, good for dinner? lunch? desert?, atmosphere, tv etc.), we use those features to see if this features can represent the success of the businesses. 
+            </div>
+
+            <h2>Hypothesis</h2>
+
+            <h2>Methodology and Implementation Details</h2>
+            <p>
+                a. Data Cleaning:
+                In this step, we extract the data that we need form the yelp dataset, and using this data to make our training data. In our trainging data, we label 1 as successful, 0 as not successful.  
+            </p>
+
+            <p>
+                b. Feature extraction
+                We will normalize the texts, extract all the features we need for the machine learning model.
+                In this part we extract the reviews, parking, outdoor seating, price range, good for(dinner, lunch, dessert), ambience, takes reservations, wifi, wheelchair service. 
+
+                In order to use all those features to our classifier, we transform our features for example: if outdoor seating is provided, price range is 1, good for dinner, we will transform it to a string: "OUTDOOR_SEATING_PROVIDED PRICE_RANGE_1 GOOD_FOR_DINNER", append all these features together and let the vectorizer to handle the feature space transform.
+            </p>
+            <p>
+                c. Model Training and Classification
+                After we have the features ready, we will feed the data to models and choose and tweak machine learning models, and see which one gives us the best result. We will perform cross validation, and make predictions on some testing data.
+                We will use three classifiers: Naive Bayse, Logistic, SVM  
+            </p>
+            <p>
+                d. Visiualization
+                We use d3 to visiualize our result. 
+            </p>
+
+            <h2>Result</h2>
+            <div id="chart_2"></div>
+            <div id="chart_3"></div>
         <div class="col-md-2"></div>
     </div>
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
 
+var width = 300,
+    height = 400,
+    radius = Math.min(width, height) / 2;
+
+var color = d3.scale.category20();
+
+var pie = d3.layout.pie()
+    .value(function(d) { return d.waiter; })
+    .sort(null);
+
+var arc = d3.svg.arc()
+    .outerRadius(radius - 20);
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+
+
+d3.tsv("data.tsv", type, function(error, data) {
+  var path = svg.datum(data).selectAll("path")
+      .data(pie)
+    .enter().append("path")
+      .attr("fill", function(d, i) { return color(i); })
+      .attr("d", arc)
+      .each(function(d) { this._current = d; }); // store the initial angles
+
+  // var text = svg.datum(data).selectAll("text")
+  //   .data(pie);
+  //   text.enter()
+  //   .append("text")
+  //   .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+  //   .attr("dy", ".65em")
+  //   .text(function(d) {
+  //     return d['value'];
+  //   });
+
+  d3.selectAll("input")
+      .on("change", change);
+
+  // var timeout = setTimeout(function() {
+    d3.select("input[value=\"\"]").property("checked", true).each(change);
+  // }, 5000);
+
+
+  function change() {
+    var value = this.value;
+    // clearTimeout(timeout);
+    pie.value(function(d) { 
+    return d[value]; }); // change the value function
+    path = path.data(pie); // compute the new angles
+    path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
+
+  }
+
+
+
+});
+
+function arcTween(a) {
+  var i = d3.interpolate(this._current, a);
+  this._current = i(0);
+  return function(t) {
+    return arc(i(t));
+  };
+}
+
+
+function type(d) {
+  d.waiter = +d.waiter;
+  d.wheelchair = +d.wheelchair;
+  d.delivery = +d.delivery;
+  d.credit_card = +d.credit_card;
+  return d;
+}
+
+</script>
+
+<script>
+var margin = {top: 30, right: 10, bottom: 10, left: 10},
+    width = 700 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+var x = d3.scale.linear()
+    .range([0, width])
+
+var y = d3.scale.ordinal()
+    .rangeRoundBands([0, height], .2);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("top");
+
+var svg2 = d3.select("#chart_2").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+d3.tsv("data2.tsv", type, function(error, data) {
+  x.domain(d3.extent(data, function(d) { return d.value; })).nice();
+  y.domain(data.map(function(d) { return d.name; }));
+
+  svg2.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", function(d) { return d.value < 0 ? "bar negative" : "bar positive"; })
+      .attr("x", function(d) { return x(Math.min(0, d.value)); })
+      .attr("y", function(d) { return y(d.name); })
+      .attr("width", function(d) { return Math.abs(x(d.value) - x(0)); })
+      .attr("height", 30)
+
+  
+
+  svg2.selectAll("text")
+    .data(data)
+    .enter().append("text")
+      // .attr("class", function(d) { return d.value < 0 ? "bar negative" : "bar positive"; })
+      .attr("x", function(d) { return x(Math.min(0, d.value)); })
+      .attr("y", function(d) { return y(d.name); })
+      .text(function(d) { return d.label; })
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "12px")
+      .attr("fill","#663300")
+  svg2.append("g")
+      .attr("class", "x axis")
+      .call(xAxis);
+
+  svg2.append("g")
+      .attr("class", "y axis")
+    .append("line")
+      .attr("x1", x(0))
+      .attr("x2", x(0))
+      .attr("y2", height);
+
+});
+
+function type(d) {
+  d.value = +d.value;
+  return d;
+}
+
+</script>
+
+
+<script>
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 700 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+
+var x2 = d3.scale.linear()
+    .range([0, width]);
+
+var y2 = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis2 = d3.svg.axis()
+    .scale(x2)
+    .orient("bottom");
+
+var yAxis2 = d3.svg.axis()
+    .scale(y2)
+    .orient("left");
+
+var area = d3.svg.area()
+    .x(function(d) { return x2(d.item); })
+    .y0(function(d) { return y2(d.low); })
+    .y1(function(d) { return y2(d.high); });
+
+var svg3 = d3.select("#chart_3").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("neg.tsv", function(error, data) {
+  data.forEach(function(d) {
+    d.item = d.item;
+    d.low = +d.low;
+    d.high = +d.high;
+  });
+
+
+  x2.domain([1, d3.max(data, function(d,i) { return i+1; })]);
+  y2.domain([0, 5000]);
+
+  svg3.append("path")
+      .datum(data)
+      .attr("class", "area_neg")
+      .attr("d", area);
+
+
+  svg3.append("g")
+      .attr("class", "y axis2")
+      .call(yAxis2)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Rent ($)");
+});
+
+
+
+d3.tsv("pos.tsv", function(error, data) {
+  data.forEach(function(d) {
+    d.item = d.item;
+    d.low = +d.low;
+    d.high = +d.high;
+  });
+
+
+  console.log( d3.max(data, function(d,i) { return i+1; }))
+  x2.domain([1, d3.max(data, function(d,i) { return i+1; })]);
+  y2.domain([0, 5000]);
+
+  svg3.append("path")
+      .datum(data)
+      .attr("class", "area_pos")
+      .attr("d", area);
+
+
+});
+
+</script>
 </body>
 </html>
 

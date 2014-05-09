@@ -1,0 +1,3 @@
+Total waiter 1485
+True is 883
+False is 602
