@@ -14,6 +14,8 @@ from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 from tokenizer import Tokenizer
+from operator import itemgetter
+import json
 
 csv.field_size_limit(sys.maxsize)
 
@@ -21,6 +23,7 @@ def main():
 	##### DO NOT MODIFY THESE OPTIONS ##########################
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-training', required=True, help='Path to training data')
+	parser.add_argument('-business_file', required=True, help='Path to business data')
 	parser.add_argument('-c', '--classifier', default='nb', help='nb | log | svm')
 	parser.add_argument('-top', type=int, help='Number of top features to show')
 	parser.add_argument('-test', help='Path to test data')
@@ -110,7 +113,9 @@ def main():
 		file_reader = csv.reader(csv_file)
 		test_tweets = []
 		true_lable = []
+		business = []
 		for line in file_reader:
+			business.append(line[0])
 			test_tweets.append(line[2])
 			true_lable.append(int(line[1]))
 		terms = vectorizer.transform(test_tweets)
@@ -121,8 +126,40 @@ def main():
 		print ("Test accuracy: %f" % accuracy)
 		# Predict labels for the test set
 		
-		'''# Print the classification report
+		# Print the classification report
 		target_names = ['Negative', 'Positive']
+
+		if opts.classifier != 'svm':
+			test_predicted_proba = classifier.predict_proba(terms)
+			util.plot_roc_curve(true_lable, test_predicted_proba)
+
+			positive_prob = []
+			negative_prob = []
+			for i, item in enumerate(true_lable):
+				if true_lable[i] == 1:
+					positive_prob.append([i, test_predicted_proba[i][0], test_predicted_proba[i][1]])
+				else:
+					negative_prob.append([i, test_predicted_proba[i][0], test_predicted_proba[i][1]])
+			sorted_positive = sorted(positive_prob, key=itemgetter(1), reverse= True)
+			positive_bias = sorted_positive[0:5]
+			sorted_negative = sorted(negative_prob, key=itemgetter(1))
+			negative_bias = sorted_negative[0:5]
+
+			bfile = open(opts.business_file, 'r')
+			bdic = {}
+			for line in bfile:
+				line = json.loads(line)
+				bdic[line['business_id']] = line['name']
+			print '\n'
+			print 'top 5 positively biased businesses are:'
+			for item in positive_bias:
+				print bdic[business[item[0]]]
+			print '\n'
+			print 'top 5 negatively biased businesses are:'
+			for item in negative_bias:
+				print bdic[business[item[0]]]
+
+		'''
 		print 'Classification Report:'
 		print classification_report(true_lable, predict_lable, target_names=target_names)
 		# Print the confusion matrix
