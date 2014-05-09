@@ -40,11 +40,11 @@ def main():
 		if line['business_id'] not in business:
 			business[line['business_id']] = {}
 			business[line['business_id']]['label'] = label[line['business_id']]
-			business[line['business_id']]['text'] = line['text'].encode('utf-8').replace('\n', '')
+			# business[line['business_id']]['text'] = line['text'].encode('utf-8').replace('\n', '')
 			business[line['business_id']]['text'] = ""
 
-		else:
-		 	business[line['business_id']]['text'] = business[line['business_id']]['text'] + ' ' + line['text'].encode('utf-8').replace('\n', '')
+		# else:
+		 	# business[line['business_id']]['text'] = business[line['business_id']]['text'] + ' ' + line['text'].encode('utf-8').replace('\n', '')
 
 	for bid in business:
 		if 'Outdoor Seating' not in business_dic[bid]['attributes']:
