@@ -1,0 +1,11 @@
+name	value	label
+A 	-1.5550	feature_negativereview
+B 	1.1963	feature_positivereview
+C 	-0.6663	feature_paidwifi
+D 	1.0938	feature_goodfor_dessert
+E 	-0.4870	feature_pricerange_casu
+F 	0.9980	feature_ambience_hipst
+G 	-0.4863	feature_yesgroup
+H 	0.6483	feature_goodfor_unknown
+I 	-0.4821	feature_pricerange_3
+J 	0.9649	feature_ambience_intim
