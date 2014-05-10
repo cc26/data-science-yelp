@@ -136,6 +136,13 @@ def main():
 		elif business_dic[bid]['attributes']['Good for Kids'] == 0:
                         business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_NOKIDS'
 
+		# if 'Accepts Credit Cards' not in business_dic[bid]['attributes']:
+		# 	business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_UNKNOWNCREDIT'
+		# elif business_dic[bid]['attributes']['Accepts Credit Cards'] == 1:
+  #                       business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_YESCREDIT'
+		# elif business_dic[bid]['attributes']['Accepts Credit Cards'] == 0:
+  #                       business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_NOCREDIT'
+
 		if 'Good For Groups' not in business_dic[bid]['attributes']:
 			business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_UNKNOWNGROUPS'
 		elif business_dic[bid]['attributes']['Good For Groups'] == 1:
@@ -143,6 +150,22 @@ def main():
 		elif business_dic[bid]['attributes']['Good For Groups'] == 0:
                         business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_NOGROUPS'
 
+		# if 'Noise Level' not in business_dic[bid]['attributes']:
+		# 	business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_UNKNOWNNOISE'
+		# elif business_dic[bid]['attributes']['Noise Level'] == 'loud':
+  #                       business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_LOUDNOISE'
+		# elif business_dic[bid]['attributes']['Noise Level'] == 'average':
+  #                       business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_AVERAGENOISE'
+		# elif business_dic[bid]['attributes']['Noise Level'] == 'quiet':
+  #                       business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_QUIETNOISE'
+		
+		if 'Outdoor Seating' not in business_dic[bid]['attributes']:
+			business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_UNKNOWNOUTDOOR'
+		elif business_dic[bid]['attributes']['Outdoor Seating'] == 1:
+                        business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_YESOUTDOOR'
+		elif business_dic[bid]['attributes']['Outdoor Seating'] == 0:
+                        business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_NOOUTDOOR'
+   
 		if 'Delivery' not in business_dic[bid]['attributes']:
 			business[bid]['text'] = business[bid]['text'] + ' ' + 'FEATURE_UNKNOWNDELIVERY'
 		elif business_dic[bid]['attributes']['Delivery'] == 1:

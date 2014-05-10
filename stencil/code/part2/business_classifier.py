@@ -141,23 +141,23 @@ def main():
 				else:
 					negative_prob.append([i, test_predicted_proba[i][0], test_predicted_proba[i][1]])
 			sorted_positive = sorted(positive_prob, key=itemgetter(1), reverse= True)
-			positive_bias = sorted_positive[0:5]
+			positive_bias = sorted_positive[0:100]
 			sorted_negative = sorted(negative_prob, key=itemgetter(1))
-			negative_bias = sorted_negative[0:5]
+			negative_bias = sorted_negative[0:100]
 
 			bfile = open(opts.business_file, 'r')
 			bdic = {}
 			for line in bfile:
 				line = json.loads(line)
-				bdic[line['business_id']] = line['name']
-			print '\n'
-			print 'top 5 positively biased businesses are:'
+				bdic[line['business_id']] = [line['name'], line['full_address']]
+			positive = open('positive_bias.csv', 'w')
+			writer_positive = csv.writer(positive)
+			negative = open('negative_bias.csv', 'w')
+			writer_negative = csv.writer(negative)
 			for item in positive_bias:
-				print bdic[business[item[0]]]
-			print '\n'
-			print 'top 5 negatively biased businesses are:'
+				writer_positive.writerow((bdic[business[item[0]]][0], bdic[business[item[0]]][1]))
 			for item in negative_bias:
-				print bdic[business[item[0]]]
+				writer_negative.writerow((bdic[business[item[0]]][0], bdic[business[item[0]]][1]))
 
 		'''
 		print 'Classification Report:'

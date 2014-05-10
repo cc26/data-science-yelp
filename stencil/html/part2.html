@@ -41,7 +41,7 @@ form {
 <head>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Final Project</title>
+    <title>Bias Evaluation</title>
 </head>
 
 <body>
@@ -50,24 +50,36 @@ form {
         <div class="col-md-2"></div>
         <div class="col-md-8">
             <div class="page-header center">
-                <h1>Final Project</h1>
+                <h1>Bias Evaluation</h1>
             </div>
 
             <h2>Motivation</h2>
 			<p>
-                The rapid development of Internet and mobile technology has brought people new ways to explore their neighbourhoods. In the old days, people use yellow books or ask around to find interesting businesses around them -- businesses changes over time, so these methods are not quite efficient. Nowadays, when people arrive at a new place, they search on the Internet to find out what are the most interesting and popular business around. For a business, it becomes increasingly important to build up their <b>Internet Popularity</b>. 
-
-                Our project intend to explore the relationship between a business's Internet popularity and the features this business has. 
+                The rapid development of Internet and mobile technology has brought people new ways to explore their neighborhoods. In the old days, people use yellow books or ask around to find interesting businesses around them. But since businesses changes over time, these methods are not quite efficient. Nowadays, when people arrive at a new place, they search the Internet to find out what are the most interesting and popular businesses around. So for a business, it becomes increasingly important to build up its <b>Internet Popularity</b> a.k.a: Star Rating.<br><br> Our project intend to explore the relationship between a business's Internet popularity(Star Rating) and its features.
 			</p>
-            <h2>Problem</h2>
+            <h2>Problem and Null Hypothesis</h2>
             <p>
-                When we use yelp, we normally search and sort by the average stars. We might as well look at the review count as a reference in order to guarantee that we have enough samples to support the average stars. However what we don't know is "Is this enough?", are there more factors that we should take into account?
-
-                With that in mind, we therefore a peek take into the yelp's business data as the picture as following:
-
+                When we use yelp to find whether a business is good or not, we usually pay lots of attention to its Star Rating. If the rating is high (for example 4.5 or 5.0), we typically consider that the business is very successful. If the rating is not so shining (for example 3.0 or 4.0), we usually think that the business is mediocre. However, this is not always true. The reliability of Star Rating is largely determined by the review count. If the review count for a certain business is high, then that means the Star Rating for that business is an average of the star ratings given by lots of people. Hence there are less variance and bias associated with the star rating, and we can believe that the Star Rating is indeed a genuine representation of the quality of the business. On the other hand, if the review count is small, then there will be larger variance and bias associated with the star rating. So sometimes it is unwise to determine the goodness of a business using star rating when the review count is small. Our goal is to examine the degree to which the Star Rating is biased for business who has small review count, and report businesses with high positive bias (highly rated but actually mediocre) and those with high negative bias (poorly rated but actually pretty good).<br><br>Null Hypothesis: For businesses whose review count is small, there will be relatively large bias in their Star Ratings.
             </p>
           
-            <div id = "chart"> 
+            
+
+          
+            <h2>Assumption, Methodology and Implementation Details</h2>
+	    <h3>Assumptions</h3>
+            <p>
+		Before digging into methodology and implementation details, we first clarify our assumptions as follows:<br>1: If the review count for a given business is greater than or equal to 5, then we consider the review count as sufficiently large.<br>2: For a given business, if the review count is sufficiently large, then we consider the Star Rating of the business to be sufficiently reliable.<br>3: We define the success of a business with high review count using a binary variable: 1 for successful and 0 for not successful. For a given business, if its Star Rating is greater than or equal to 4.5, then we assign 1 (successful) to the business. Otherwise we assign 0 (not successful) to the business. In this way we obtain the true label of the training data in the classification step.
+	    </p>
+	    <h3>Data Cleaning</h3>		
+            <p>
+                In this step, we extract the data we need to form our training data. We use data from yelp_academic_dataset_business.json and yelp_academic_dataset_review.json. In particular, we get 'business_id', 'name', 'review_count', 'stars', 'attributes' from yelp_academic_dataset_business.json, and review text from yelp_academic_dataset_review.json. The most challenging part is processing the review text. We convert the review text into a sentiment level (negative_review, neutral_review, positive_review) which we use as a feature. We accomplish this by first concatenating the reviews for each business, and then compute the average sentiment score of each business (similar to what we did in assignment 2). The average sentiment score is calculated by dividing the total sentiment score of a review by the number of sentiment words in that review. The purpose of doing so is to leverage the fact that different businesses have different review length. We then partition the score into 3 equal parts: If the score is below 1, we assign 'negative_review' to the feature variable. If it is between 1 and 1.5, we assign 'neutral_review'. Otherwise we assign 'positive_review'.
+            </p>
+	    <h3>Feature Extraction</h3>
+	    <h4>Inspiration</h4>
+	    <p>
+		Before extracting features, we must determine which feature should be used. We examine the 'attribute' part of each successful business in yelp_academic_dataset_business, and use D3 visualization to create a dynamic pie chart to see if there is any trend. Below is the visualization. For simplicity, we only visualize features that take binary values (True or False).
+	    </p>
+	    <div id = "chart"> 
                  <form>
               <label><input type="radio" name="dataset" value="waiter" checked> waiter?</label>
               <label><input type="radio" name="dataset" value="wheelchair"> wheelchair?</label>
@@ -78,44 +90,106 @@ form {
             </div>
 			
             <div>
-                
-                The data for the pie chart is taken from the yelp's business data whos average start is greater than 4, and the review count is greater than 10, we call them successful business just for now. 
-                The dark color means true, and the light color means false. 
-                We say that for most successful business has waiter service, provides credit card service, wheelchair service and do not provide delivery. 
-
-                In light of this, we first define our so called "successful business" based on the average star and total review count.
-                Using this information as our training data, we use the other features to do the cross reference test. For example: review, 
-                attributes(parking, good for dinner? lunch? desert?, atmosphere, tv etc.), we use those features to see if this features can represent the success of the businesses. 
+                Explanation:<br><br>
+                The pie chart is based on over 10000 successful businesses. The dark blue means the percentage of business that has a certain feature. The light blue means the percentage of business that doesn't have the feature.<br><br>
+	        For example, after we click on 'wheelchair', we can see that over 95% of the successful businesses are wheelchair accessible, and over 95% of the successful businesses accept credit cards. The majority of successful businesses have waiter service, and the majority of successful businesses don't deliver.<br><br>
+                In light of this, we determine that the features in 'attribute' field could be potential candidate features.
             </div>
-
-            <h2>Hypothesis</h2>
-
-            <h2>Methodology and Implementation Details</h2>
+	    <h4>Features</h4>
             <p>
-                a. Data Cleaning:
-                In this step, we extract the data that we need form the yelp dataset, and using this data to make our training data. In our trainging data, we label 1 as successful, 0 as not successful.  
-            </p>
+                We use the following features for our classifier:<br>
+		1: Review text sentiment level (described in data cleaning part).<br>
+		2: Whether the business provides outdoor seating.<br>
+		3: The price range of the business.<br>
+		4: What ambience does the business have.<br>
+		5: What attire is required.<br>
+		6: Whether the Wi-Fi is available.<br>
+		7: Whether the business is good for kids.<br>
+		8: Whether the business is good for groups.<br>
+		9: Is delivery available?<br>
+		10: Does the business take reservations?<br>
+		11: Is there TV in the business?<br>
+		12: Is wheelchair accessible?<br>
+		13: Is the business(restaurant) good for breakfast/lunch/dinner?<br><br>
 
-            <p>
-                b. Feature extraction
-                We will normalize the texts, extract all the features we need for the machine learning model.
-                In this part we extract the reviews, parking, outdoor seating, price range, good for(dinner, lunch, dessert), ambience, takes reservations, wifi, wheelchair service. 
-
-                In order to use all those features to our classifier, we transform our features for example: if outdoor seating is provided, price range is 1, good for dinner, we will transform it to a string: "OUTDOOR_SEATING_PROVIDED PRICE_RANGE_1 GOOD_FOR_DINNER", append all these features together and let the vectorizer to handle the feature space transform.
+                Each feature has its possible values. For example: For each business, feature 'Wi-Fi' can take values from UNKNOWNWIFI(feature missing), FREEWIFI, PAIDWIFI, and NOWIFI. The similar rule applies to all other features. Finally, all those 12 feature values are concatenated into a string, and then passed to the countvectorizer to do tokenization and classification.
             </p>
+	    <h3>Model Training and Classification</h3>
             <p>
-                c. Model Training and Classification
-                After we have the features ready, we will feed the data to models and choose and tweak machine learning models, and see which one gives us the best result. We will perform cross validation, and make predictions on some testing data.
-                We will use three classifiers: Naive Bayse, Logistic, SVM  
+                Now that we have the features ready, we will feed them to train our classifier. Note that we only choose businesses that have sufficient review count for our training data because we want their Star Ratings to be reliable (so the true labels are reliable). We compare and contrast three classifiers: Naive Bayes, Logistic Regression, and SVM. We train our data, do 10 fold cross validation, and pick the best classifier. Below is the classification result produced by each classifier:<br><br>
+<pre><code>Naive Bayes Classifier:
+Training accuracy: 0.590109
+Cross-Validation Accuracy: 0.589911 (+/- 0.016422)
+Most informative features
+-3.8715	feature_goodfor_latenight  2.2966 feature_positivereview
+-3.7286	feature_ambience_touristi  2.0905 feature_unknown_pricerang
+-3.6805	feature_paidwifi	   1.6596 feature_unknownoutdoor_s
+-3.6324	feature_negativereview	   1.6264 feature_unknowngroup
+-3.4247	feature_yesreserv	   1.6082 feature_attire_pricerang
+</code></pre>
+<pre><code>Logistic Regression:
+Training accuracy: 0.807715
+Cross-Validation Accuracy: 0.805242 (+/- 0.011036)
+Most informative features
+-1.5679	feature_negativereview      1.1833 feature_positivereview
+-0.6745	feature_paidwifi 	    1.0934 feature_goodfor_dessert
+-0.4996	feature_yesgroup	    0.9979 feature_ambience_hipst
+-0.4979	feature_pricerange_casu	    0.9642 feature_ambience_intim
+-0.4897	feature_pricerange_3	    0.6474 feature_goodfor_unknown
+</code></pre>
+<pre><code>Support Vector Machine:
+Training accuracy: 0.808309
+Cross-Validation Accuracy: 0.805143 (+/- 0.009352)
+Most informative features
+-0.5176	feature_negativereview      0.4048 feature_positivereview
+-0.2178	feature_paidwifi	    0.3620 feature_goodfor_dessert
+-0.1686	feature_pricerange_casu	    0.3237 feature_ambience_hipst
+-0.1648	feature_pricerange_3	    0.3008 feature_ambience_intim
+-0.1606	feature_yesgroup	    0.2288 feature_goodfor_unknown
+</code></pre>
+As can be seen from above, we find that most informative features are similar for all those classifiers. However, Naive Bayes does a horrible job on training accuracy and validation accuracy. This is because our features are correlated with each other (review sentiment may be closely related to ambiance or Wi-Fi availability), so the conditional independence assumption of Naive Bayes is not met. The accuracy of Logistic Regression and Support Vector Machine are very similar, but since svm has the danger of over-fitting data more than logistic regression does, we decide to choose logistic regression as our best classifier. We notice that our classifier is pretty good since its training accuracy and cross-validation accuracy are both over 80%. Below is a D3 visualization of the top 5 most positively informative features and top 5 most negatively informative features and their corresponding weight for Logistic Regression:
             </p>
-            <p>
-                d. Visiualization
-                We use d3 to visiualize our result. 
-            </p>
-
-            <h2>Result</h2>
-            <div id="chart_2"></div>
+	    <div id="chart_2"></div>
+	    <p>From the visualization, we can see that:<br>1: The review sentiment has the highest weight.<br>2: Customer seems to be annoyed by the Paid Wifi.<br>3: For a restaurant, good dessert can boost its popularity a lot.</p>
+            <h2>Result and Analysis</h2>
+	    <p>Now that we have our best classifier, we can use this classifier to test businesses with small review count. We test a total of around 5000 businesses whose review count are less than 5. Here we assume that a Star Rating of over 4.5 gives the client a sense that the business is successful. In this way we can get a list of 'true label' indicating whether or not client will consider these businesses as successful based solely on the Star Rating. We can then compare the predicted label produced by our classifier with those 'true label' to examine if the popularity is biased or not. Note that the prediction accuracy here doesn't represent the quality of our classifier. High accuracy implies that the predicted result matches the star rating, so the rating is not so biased. On the other hand, low accuracy implies that the predicted result differs dramatically from the star rating, so the bias is huge. Below is our prediction accuracy using Logistic Regression:
+<pre><code>Test accuracy: 0.717316
+</code></pre>
+From the result we can see that the test accuracy is around 70%, meaning that for around 3500 businesses (out of 5000) our prediction result is the same as the 'true label'. This implies that the overall bias is relatively small. But there is one thing to keep in mind: The Star Rating of our businesses typically range from 3 to 5. If for one business the star rating is 4 and our classifier produces a prediction probability which is equivalent to star rating 3, they will both indicate unsuccessful business. But the star gap is 1, which is non-trivial. So in this case the bias do exists but it can't be detected by our classifier. So we expect the true bias to be greater than our produced result. Hence it seems necessary to examine businesses that are most positively biased (Star rating is high but not so good according to our classifier), and businesses that are most negatively biased (Star rating is low but classified as successful). Below are the names of the businesses:
+<pre><code>Top 10 most positively biased businesses:
+McDonald's(8325 W Deer Valley Road)
+Big Burrito Mexican Food Peoria
+RJ's Sports Grill Phoenix
+Burger King Phoenix
+Tio Freddys Mexican Food-Jalapenos Glendale
+RigaTony's Glendale
+Jack In The Box Mesa
+Little Caesars Phoenix
+Life Cafe Chandler
+Taco Bell
+</code></pre>
+<pre><code>Top 10 most negatively biased businesses:
+City Market Deli
+Indigo Joe's Sports Pub & Restaurant Scottsdale
+Sahara Nights
+Starliner Diner
+Skyline Aquatic Center Glendale
+Gymboree Play & Music Mesa
+Top of the Reef
+KDKB 93.3 FM
+Desert Breeze Railroad
+Wupatki National Monument
+</code></pre>
+When examining factors that could possibly lead to the bias, fortunately we have zillow api that can provide us the price range of the rent of building for a particular business. We use D3 visualization to see if there is any observable trends:
+	    </p>
             <div id="chart_3"></div>
+	    <p>
+		Blue range represents the price range for 100 most positively biased businesses, and black range represents the price range for 100 most negatively biased businesses. Note that the average rent price for all business is around 1500$ (not shown in visualization).<br><br> We can make an educated guess that since the rent for positively biased businesses is typically higher than the average rent, they are probably located in rich areas and people tend to have a better prior knowledge of them, while since the rent for negatively biased businesses is typically lower than the average rent, they are probably located in poor areas and people tend to have a worse prior knowledge of them. This could be an educated guess of one possible source of the bias (especially when the review count is small).
+	    </p>
+	    <h2>Conclusion</h2>
+	    <p>
+		From the above result and analysis, we can see that for businesses whose review count is small, the average bias of the popularity is not as large as we expected. But since our result is an optimistic estimate (explained in the above section), people still need to take caution when they search for businesses with low review count. Looking solely at the Star Rating may not be sufficient because of the potential bias. When further evaluating the goodness of a business, we recommend clients to also look at the top distinguishing features produced by our classifier. Such as review sentiment level, Wi-Fi availability, and so on..
+	    </p>
         <div class="col-md-2"></div>
     </div>
 
