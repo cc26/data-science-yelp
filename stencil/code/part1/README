@@ -1,0 +1,8 @@
+You can run the programs using/changing the script file in this folder. To build index, run
+  ./run_index
+There is an index file in /coures/cs1951a/pub/final/temp/azu_index.json
+to make queries, run
+  ./run_query
+It is advised to run the query program with larger memory, preferably 8G.
+
+To learn more about this part, please view the writeup in html/part1.html

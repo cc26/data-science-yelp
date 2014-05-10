@@ -1,0 +1,50 @@
+Ranking Result:
+
+Single With H: 
+bbq
+
+[u'JokKtdXU7zXHcr20Lrk29A', u'V1nEpIRmEa1768oj_tuxeQ', u'WNy1uzcmm_UHmTyR--o5IA', u'MuIXnv7Oq7X3-4aEsp9dDA', u'c1yGkETheht_1vjda7G5sA', u'L9UYbtAUOcfTgZFimehlXw', u'VVeogjZya58oiTxK7qUjAQ', u'vARjqeIkSNsazHltujiq4Q', u'zp713qNhx8d9KCJJnrw1xA', u'EWMwV5V9BxNs_U6nNVMeqw']
+
+
+w/o H
+[u'2a4wMeWkUcS2Qlx47_iQ-Q', u'rj9Gt5Sifo-iN44vSfdKpQ', u'fjHUnUP1Lt-YAbeWUx2LrQ', u'NkGQRN6ahwQoFEAlHq8NHg', u'NaXqRvoW2Zg2wSghf9JqaA', u'LYCaveWFti6kUHpMzYKLjA', u'XfFdm2wlaO3IDh-i1O-DTQ', u'VCGyfZMhaCNUnYTK-ihvXQ', u'TCi5dyUUVHvFctgkstc1Kg', u'glDy-a_H8hEuUwKp7-RUcQ']
+
+chinese
+
+[u'c1yGkETheht_1vjda7G5sA', u'L9UYbtAUOcfTgZFimehlXw', u'VVeogjZya58oiTxK7qUjAQ', u'z3yFuLVrmH-3RJruPEMYKw', u'-sC66z4SO3tR7nFCjfQwuQ', u'9BJ5h9X1krpXFjKj0a6wbg', u'K8pM6qQdYu5h6buRE1-_sw', u'_FXql6eVhbM923RdCi94SA', u'Zx8_4zKdDBSO3qGrkukBIA', u'OFBJtqWGSx6n6CchtVmoRw']
+
+w/o H
+[u'MpFziuV66BreNV1VMCYs9g', u'Tr3EsurgHqGPTXwAfjZ04Q', u'SS073W0tN3nvG36Qy6n0qg', u'UxvOXcoCRFRAVhRB0D9imw', u'yzZxyhouOdM4NwYLEMgaWw', u'VEDXuvU1gZy3PqD9q32uwQ', u'MoDHbrMoGnLhbMIGgZZOwQ', u'Y3a3RkR97J_ReiKgiMXeJg', u'XguGFMUSEMz4wx_2G-otyA', u'rbiRLiFTG098z9JaK3Nshw']
+
+Free Text with H
+burrito mexican
+[u'JokKtdXU7zXHcr20Lrk29A', u'WNy1uzcmm_UHmTyR--o5IA', u'L9UYbtAUOcfTgZFimehlXw', u'vARjqeIkSNsazHltujiq4Q', u'zp713qNhx8d9KCJJnrw1xA', u'EWMwV5V9BxNs_U6nNVMeqw', u'-sC66z4SO3tR7nFCjfQwuQ', u'ntN85eu27C04nwyPa8IHtw', u'QnAzW6KMSciUcuJ20oI3Bw', u'uKSX1n1RoAzGq4bV8GPHVg']
+
+w/o H
+[u'3uKAHQr19vFUfBJuXdmhEA', u'lEpLxSA35gbmV6VwJ64wVw', u'UxvOXcoCRFRAVhRB0D9imw', u'CdqTxe171tKTOkk8T15GGA', u'RqbSeoeqXTwts5pfhw7nJg', u'jDyn5GnMiWllhB7qDpzltw', u'E3RjJH45EX6rHYDs0TYSRA', u'UCjtaUCtJPbTUouHtQURvQ', u'xdv2kvaZodkWvTSV6pSSpA', u'ObYf1kZVWfL8NocxUwGJKg']
+
+thai peanut noodle
+[u'JokKtdXU7zXHcr20Lrk29A', u'c1yGkETheht_1vjda7G5sA', u'EWMwV5V9BxNs_U6nNVMeqw', u'QnAzW6KMSciUcuJ20oI3Bw', u'_FXql6eVhbM923RdCi94SA', u'qjmCVYkwP-HDa35jwYucbQ', u'IuAPYzf3NSyfyXYgT46YVA', u'AkOruz5CrCxUmXe1p_WoRg', u'FV0BkoGOd3Yu_eJnXY15ZA', u'0dORc6ckZw5HezR3BuSsqw']
+
+w/o H
+[u'WPmamMTGAmNYXGoXW1mWyQ', u'joxWCp6dgN-kTE9GMziwjA', u'1621ir5mjVgbHwxCbMAEjg', u'ykfTh6HI219NoMsWBxulxw', u'uMxfxbqT27XDeU9UTXeErg', u'3rqoxOasrRKxNubxjLSElA', u'wzuIHNOJrxSwfhKt-wV1TA', u'XguGFMUSEMz4wx_2G-otyA', u'VsO_rhXi5lgbaGxNwoEZsQ', u'L-uPZxooP_ziXCtRrWi8Pw']
+
+Phrase With H:
+"Chinese Food"
+[u'Zx8_4zKdDBSO3qGrkukBIA', u'jfDBaBgwINrGYAo8p2MJ4g', u'Lnohr9bpCbHNsomazXDg-w', u'1sNa5oW9ZYX8MbMFkx9LzQ', u'bF7KQ6AQK5rBS7aOFKtlWg', u'mjoxSQR7bFQtlIIjfNfaSQ', u'0db71MbrvcJnyk71COCJBg', u'JPRyCrWPIo_ujOszH1NRzg', u'oJpmYvLibGrYPDvcaUeMOw', u'Az_IY3TgnOcnh1dXd7GZLg']
+
+w/o H
+[u'T_d9GB_p0ajNTVEZ2CMmrw', u'4l3eeM1sOACwdJAz4UyIPQ', u'KpCKaIDZ1m4bQj2ur3olfg', u'8TGUK7LD3M-vLWml-jLb0w', u'VDLQNhp695jcwTvMFi8W5g', u'cuxqnMMmbBV0iE2KJJy60Q', u'm2M7X5ItFvhOC7a6B7JcDg', u'u2hGxSbpIOZZ3KliIELuTQ', u'AYAb0qJX5wuT2sRtz4CjpA', u'B-WxQYb3A9SKyGm2aqk9tg']
+
+"good chinese food" 
+[u'jfDBaBgwINrGYAo8p2MJ4g', u'hrOsdyai-9B91cGjBspHqw', u'1vYaGPKQzMebBJXFCGTH2g', u'dxAlupwjiQH91m4cE9a17g', u'xhwp_bACX0017Qxu8_AVbw', u'UVBPF4oYrb0QfgW_DMbLPg', u'BicQSnGZnY_yuGEDkhVfnA', u'AYAb0qJX5wuT2sRtz4CjpA', u'kOK86MUuK-VWfJEYuvHUnQ', u'08eBj_o6oTncJR0ylM8qSg']
+
+w/o H
+[u'UVBPF4oYrb0QfgW_DMbLPg', u'08eBj_o6oTncJR0ylM8qSg', u'kOK86MUuK-VWfJEYuvHUnQ', u'1vYaGPKQzMebBJXFCGTH2g', u'BicQSnGZnY_yuGEDkhVfnA', u'peEtKzZhsQrQgBcrEXyBPQ', u'jpgmMTN__BHg_lnJEUjM-g', u'dxAlupwjiQH91m4cE9a17g', u'xhwp_bACX0017Qxu8_AVbw', u'hrOsdyai-9B91cGjBspHqw']
+
+"nice wine bar"
+[u'LMG0zsAkUSscIvmV9vvm3A', u'MPyxaNVuWlAQqJ0iKV5rQw', u'8dEJ_o0UgGrNX1ejHcuZjA', u'mchiTm_e8xRXPf2SWMJbkQ', u'H92SaE8QEFyQHjwYEcCCCw', u'lrxoQH8u2X-XpQ38PLAgTQ', u'DiDZqjm_ti1Kim-5BhHPfA', u's0Xpzb2GzBILFAKMpAtspQ', u'4MZBPKr4Kmw_5hiElostjw', u'MEraJIKYztC7IOzYwMe86g']
+
+w/o H
+[u'DiDZqjm_ti1Kim-5BhHPfA', u's0Xpzb2GzBILFAKMpAtspQ', u'OECFqFDCDuqF8qWngIEJeA', u'xxYiSZgmwE-9-quy8kkHEQ', u'lrxoQH8u2X-XpQ38PLAgTQ', u'mchiTm_e8xRXPf2SWMJbkQ', u'MEraJIKYztC7IOzYwMe86g', u'4MZBPKr4Kmw_5hiElostjw', u'MPyxaNVuWlAQqJ0iKV5rQw', u'LMG0zsAkUSscIvmV9vvm3A']
+

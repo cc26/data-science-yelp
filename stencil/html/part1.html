@@ -1,5 +1,20 @@
 <html>
-
+<style type="text/css">
+    table.tableizer-table {
+    border: 1px solid #CCC; font-family: Arial, Helvetica, sans-serif
+    font-size: 12px;
+} 
+.tableizer-table td {
+    padding: 4px;
+    margin: 3px;
+    border: 1px solid #ccc;
+}
+.tableizer-table th {
+    background-color: #104E8B; 
+    color: #FFF;
+    font-weight: bold;
+}
+</style>
 <head>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +22,304 @@
 </head>
 
 <body>
-
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8">
             <div class="page-header center">
                 <h1>Part 1: <small>Search Engine</small></h1>
             </div>
+            <h2>Description & Overview</h2>
+            <p>
+              Note: it's advised to run query on a computer with 8G of memory. The pre-processing time should be slightly above 1 min.
+            </p>
+            <p>
+               This project builds a simple search engine that is able to answer search queries on yelp business reviews. 
+            </p>
+            <p>
+                The business data and review data is provided by Yelp as part of its academic dataset. We preprocessed the reviews, and made a program that can make inqureys for specific word(s), phrases, and find businesses sorted by relavance.
+            </p>
+            <h2>Steps</h2>
+            <h3> Create Inverted Index </h3>
+            <h4>Structure</h4>
+            <p>
+                The structure of the inverted index: <br>
+                {word -> {business_id -> {review_id -> [positions]}}} in json form
+            </p>
+            <p>
+                First, we build an inverted index of the business data. The data we need to consider is the business data and the review data. The inverted index maps each stemmed words to a list of businesses whose reviews contains this word. We will also record the review iD, and the position of the word in that review. The dictionary is dumped as json to the inverted index file.
+            </p>
+            <p>
+                To save space, line number in the file is used instead of review_id and business_id
+            </p>
+            <h4>Why this structure?</h4>
+            <p>
+                There are two reasons for us to choose this structure:
+            </p>
+            <p>
+                First, space efficient. There is no redundant business or review ids in this structure. All data is contained, and can hardly have less content. Using the line number instead of the actual IDs also helps save storage space.
+            </p>
+            <p>
+                Second, query friendly. This is almost the same data structure we want to use for queries. By having this structure, we only need to load the map into memory and do not need to process the data for queries. The data structure for queries will be discussed later.
+            </p>
+            <h4>Storage Space</h4>
+            <p>
+                The index file turns out to be 192 MB(192737233 Bytes). 63% of the original review data file.
+            </p>
+            <h3>Query Program</h3>
+            <h4>Data Structure</h4>
+            <p>
+                The structure of the query program: <br>
+                {word -> {business_id -> {review_id -> [positions]}}} in json form
+            </p>
+            <p>
+              The data structure of the query program is the same as the data structure in the inverted index file. We just load the json flie into memory directly, and we get our data. Again, the dictionary maps each word to another dictionary, which maps business ids to review dictionary. The review dictionay maps review to a list of positions that the word appears in the review.
+            </p>
+            <p>
+              Since we use line number instead as ids in the inverted index file, we also need to load the the yelp business data json file to convert business line number back to its business information. To do this, we create another dictionary that maps line number to the business information from the yelp business file.
+            </p>
+            <h3>Processing Review Texts</h3>
+            <p>
+              When processing the review texts, we did the following tokenizing steps:
+              <ol>
+                <li>Lowercase all caharacters</li>  
+                <li>Apply stemming using Porter Stemmer</li>
+                <li>Strip punctuations</li>
+                <li>Replace two or more occurances of the same character with two occurrences. </li>
+                <li>ignore words that don't start with an alphabet</li>
+                <li>Use the strop words list</li>
+              </ol>
+            </p>
+            <h3>Making Queries</h3>
+            <p>
+              There are three kind of queries the user can make: single word query, free text query, and phrase query.
+            </p>
+            <p>
+              When the query program reads in the user input, it first parse by line. Then it checks if the query starts and ends with a quotation mark. If so, then process it as a phrase query. Otherwise, the program splits the input. If there is only one word then it's processed as single word query, otherwise free text query.
+            </p>
+            <h3>Ranking Algorithm</h3>
+            <p>
+                We use term frequency - inverse document frequency (tf-idf) as the primary ranking machanism. It takes into account the number of times a term appears in the specific business, and the number of businesses that contain this term. 
+            </p>
+            <p>
+                In addition to tf-idf, we also take into stars, review count into consideration when computing the relavence between and a business. We use the heuristic function relevancy(query, business) = sum(tf_idf) * log(review_count) * stars to compute the final score. This function also puts a large weight on review count, since the more review count a businesses has, the better it servers its user.
+            </p>
+            <p>
+                Example queries are listed below. There are three types of quries, and we list the top 10 result for all of them, each with and without heuristic function added.
+            </p>
+            <p>
+                The herustic function did a good job up-ranking the business that has higher review counts. If you take a look at the table below, it's pretty clear that searches with herustic has higher review count and stars than the ones that turns off herustic. The ones without herustic may look more relavant to the search term on its title or review texts, but on average the top ones using heuristic will receive better user feedback.
+            </p>
+            <h4>Starting with Single Query with Herustic, search term: bbq ...</h4>
+            <style type="text/css">
+    table.tableizer-table {
+    border: 1px solid #CCC; font-family: Arial, Helvetica, sans-serif
+    font-size: 12px;
+} 
+.tableizer-table td {
+    padding: 4px;
+    margin: 3px;
+    border: 1px solid #ccc;
+}
+.tableizer-table th {
+    background-color: #A7D70F; 
+    color: #FFF;
+    font-weight: bold;
+}
+<style type="text/css">
+    table.tableizer-table {
+    border: 1px solid #CCC; font-family: Arial, Helvetica, sans-serif
+    font-size: 12px;
+} 
+.tableizer-table td {
+    padding: 4px;
+    margin: 3px;
+    border: 1px solid #ccc;
+}
+.tableizer-table th {
+    background-color: #20FF05; 
+    color: #FFF;
+    font-weight: bold;
+}
+</style><table class="tableizer-table">
+<tr class="tableizer-firstrow"><th>Name</th><th>Link</th><th>ID</th><th>Address</th><th>Stars</th><th>Review Count</th><th>Categories</th></tr>
+ <tr><td>Four Peaks Brewing Co</td><td>http://www.yelp.com/biz/four-peaks-brewing-co-tempe-2</td><td>JokKtdXU7zXHcr20Lrk29A</td><td>1340 E 8th St,Ste 104,Tempe, AZ 85281</td><td>4.5</td><td>956</td><td>Bars,Food,Breweries,Pubs,Nightlife,American (New),Restaurants</td></tr>
+ <tr><td>Cibo</td><td>http://www.yelp.com/biz/cibo-phoenix</td><td>V1nEpIRmEa1768oj_tuxeQ</td><td>603 N 5th Ave,Phoenix, AZ 85003</td><td>4.5</td><td>895</td><td>Italian,Pizza,Sandwiches,Restaurants</td></tr>
+ <tr><td>Cornish Pasty Company</td><td>http://www.yelp.com/biz/cornish-pasty-co-scottsdale</td><td>WNy1uzcmm_UHmTyR--o5IA</td><td>960 W University Dr,Tempe, AZ 85281</td><td>4.5</td><td>794</td><td>Pubs,Bars,Nightlife,British,Restaurants</td></tr>
+ <tr><td>Citizen Public House</td><td>http://www.yelp.com/biz/citizen-public-house-scottsdale</td><td>MuIXnv7Oq7X3-4aEsp9dDA</td><td>7111 E 5th Ave,Ste E,Scottsdale, AZ 85251</td><td>4.5</td><td>624</td><td>Gastropubs,American (New),Salad,Restaurants</td></tr>
+ <tr><td>Green</td><td>http://www.yelp.com/biz/green-tempe#query:Green</td><td>c1yGkETheht_1vjda7G5sA</td><td>2240 N Scottsdale Rd,Tempe, AZ 85281</td><td>4.5</td><td>599</td><td>Vegetarian,Vegan,Restaurants</td></tr>
+ <tr><td>Liberty Market</td><td>http://www.yelp.com/biz/liberty-market-gilbert</td><td>L9UYbtAUOcfTgZFimehlXw</td><td>230 N Gilbert Rd,Gilbert, AZ 85234</td><td>4.5</td><td>523</td><td>Food,Coffee & Tea,American (New),Restaurants</td></tr>
+ <tr><td>Pizzeria Bianco</td><td>http://www.yelp.com/biz/pizzeria-bianco-phoenix</td><td>VVeogjZya58oiTxK7qUjAQ</td><td>623 E Adams St,Phoenix, AZ 85004</td><td>4</td><td>1124</td><td>Italian,Pizza,Sandwiches,Restaurants</td></tr>
+ <tr><td>Cornish Pasty Company</td><td>http://www.yelp.com/biz/cornish-pasty-company-mesa</td><td>vARjqeIkSNsazHltujiq4Q</td><td>1941 W Guadalupe Rd,Ste 101,Mesa, AZ 85202</td><td>4.5</td><td>506</td><td>British,Restaurants</td></tr>
+ <tr><td>La Santisima Gourmet Taco Shop</td><td>http://www.yelp.com/biz/la-santisima-gourmet-taco-shop-phoenix</td><td>zp713qNhx8d9KCJJnrw1xA</td><td>1919 N 16th St,Phoenix, AZ 85006</td><td>4.5</td><td>435</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>FEZ</td><td>http://www.yelp.com/biz/fez-phoenix</td><td>EWMwV5V9BxNs_U6nNVMeqw</td><td>3815 N Central Ave,Phoenix, AZ 85012</td><td>4</td><td>911</td><td>Bars,Mediterranean,Nightlife,Lounges,American (New),Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Without Heuristic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Mama Gina's</td><td>http://www.yelp.com/biz/mama-ginas-glendale</td><td>2a4wMeWkUcS2Qlx47_iQ-Q</td><td>9380 W Westgate Blvd,Ste D101,Glendale, AZ 85305</td><td>2.5</td><td>57</td><td>Restaurants,Pizza,Italian</td></tr>
+ <tr><td>Bill Johnson's Big Apple Restaurant</td><td>http://www.yelp.com/biz/bill-johnsons-big-apple-restaurant-glendale</td><td>rj9Gt5Sifo-iN44vSfdKpQ</td><td>7322 W Bell Rd,Glendale, AZ 85308</td><td>3</td><td>4</td><td>Barbeque,Restaurants</td></tr>
+ <tr><td>Sucker Punch Sally's Diner</td><td>http://www.yelp.com/biz/sucker-punch-sallys-diner-tempe</td><td>fjHUnUP1Lt-YAbeWUx2LrQ</td><td>4 E University Dr,Tempe, AZ 85281</td><td>3</td><td>48</td><td>Food,Beer, Wine & Spirits,American (Traditional),Restaurants</td></tr>
+ <tr><td>Blue 32 Sports Grill</td><td>http://www.yelp.com/biz/blue-32-sports-grill-phoenix</td><td>NkGQRN6ahwQoFEAlHq8NHg</td><td>7000 E Mayo Blvd,Phoenix, AZ 85054</td><td>3.5</td><td>44</td><td>Burgers,American (Traditional),Sandwiches,Restaurants</td></tr>
+ <tr><td>Kwan & Wok Chinese Restaurant</td><td>http://www.yelp.com/biz/kwan-and-wok-chinese-restaurant-phoenix</td><td>NaXqRvoW2Zg2wSghf9JqaA</td><td>1702 W Camelback Rd,Phoenix, AZ 85015</td><td>3</td><td>16</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Big Heng</td><td>http://www.yelp.com/biz/big-heng-phoenix</td><td>LYCaveWFti6kUHpMzYKLjA</td><td>1739 W Glendale Ave,Phoenix, AZ 85021</td><td>4.5</td><td>10</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Tortilla Flat Superstition Saloon</td><td>http://www.yelp.com/biz/tortilla-flat-superstition-saloon-tortilla-flat</td><td>XfFdm2wlaO3IDh-i1O-DTQ</td><td>1 Main St, Hwy 88,Tortilla Flat, AZ 85190</td><td>3.5</td><td>49</td><td>American (Traditional),Mexican,Landmarks & Historical Buildings,Personal Shopping,Shopping,Public Services & Government,Restaurants</td></tr>
+ <tr><td>Him's Jl Buffet</td><td>http://www.yelp.com/biz/hims-jl-buffet-glendale</td><td>VCGyfZMhaCNUnYTK-ihvXQ</td><td>6226 N 43rd Ave,Glendale, AZ 85301</td><td>3.5</td><td>6</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Glendale Chocolate Affaire</td><td>http://www.yelp.com/biz/glendale-chocolate-affaire-glendale</td><td>TCi5dyUUVHvFctgkstc1Kg</td><td>7017 N 58th Ave,Glendale, AZ 85301</td><td>2.5</td><td>15</td><td>Arts & Entertainment,Festivals</td></tr>
+ <tr><td>Cucina Tagliani</td><td>http://www.yelp.com/biz/cucina-tagliani-avondale-3</td><td>glDy-a_H8hEuUwKp7-RUcQ</td><td>1733 N Dysart Rd,Avondale, AZ 85392</td><td>3.5</td><td>4</td><td>Restaurants,Italian</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Search Term:chinese</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Green</td><td>http://www.yelp.com/biz/green-tempe#query:Green</td><td>c1yGkETheht_1vjda7G5sA</td><td>2240 N Scottsdale Rd,Tempe, AZ 85281</td><td>4.5</td><td>599</td><td>Vegetarian,Vegan,Restaurants</td></tr>
+ <tr><td>Liberty Market</td><td>http://www.yelp.com/biz/liberty-market-gilbert</td><td>L9UYbtAUOcfTgZFimehlXw</td><td>230 N Gilbert Rd,Gilbert, AZ 85234</td><td>4.5</td><td>523</td><td>Food,Coffee & Tea,American (New),Restaurants</td></tr>
+ <tr><td>Pizzeria Bianco</td><td>http://www.yelp.com/biz/pizzeria-bianco-phoenix</td><td>VVeogjZya58oiTxK7qUjAQ</td><td>623 E Adams St,Phoenix, AZ 85004</td><td>4</td><td>1124</td><td>Italian,Pizza,Sandwiches,Restaurants</td></tr>
+ <tr><td>Defalco's Italian Grocery</td><td>http://www.yelp.com/biz/defalcos-italian-grocery-scottsdale</td><td>z3yFuLVrmH-3RJruPEMYKw</td><td>2334 N Scottsdale Rd,Ste A133,Scottsdale, AZ 85257</td><td>4.5</td><td>396</td><td>Delis,Restaurants,Sandwiches,Italian</td></tr>
+ <tr><td>Gallo Blanco</td><td>http://www.yelp.com/biz/gallo-blanco-phoenix</td><td>#NAME?</td><td>401 W Clarendon Ave,Phoenix, AZ 85013</td><td>4</td><td>731</td><td>Bars,Cafes,Nightlife,Restaurants</td></tr>
+ <tr><td>Dick's Hideaway</td><td>http://www.yelp.com/biz/dicks-hideaway-phoenix</td><td>9BJ5h9X1krpXFjKj0a6wbg</td><td>6008 N 16th St,Phoenix, AZ 85014</td><td>4.5</td><td>314</td><td>American (Traditional),Tex-Mex,Restaurants</td></tr>
+ <tr><td>Lo-Lo's Chicken & Waffles</td><td>http://www.yelp.com/biz/lo-los-chicken-and-waffles-phoenix</td><td>K8pM6qQdYu5h6buRE1-_sw</td><td>1220 S Central Ave,Phoenix, AZ 85003</td><td>4</td><td>610</td><td>Soul Food,Southern,Restaurants</td></tr>
+ <tr><td>Hula's Modern Tiki</td><td>http://www.yelp.com/biz/hulas-modern-tiki-phoenix</td><td>_FXql6eVhbM923RdCi94SA</td><td>4700 N Central Ave,Phoenix, AZ 85012</td><td>4</td><td>595</td><td>Seafood,Caribbean,Hawaiian,Restaurants</td></tr>
+ <tr><td>Chino Bandido</td><td>http://www.yelp.com/biz/chino-bandido-phoenix-3</td><td>Zx8_4zKdDBSO3qGrkukBIA</td><td>15414 N 19th Ave,Ste K,Phoenix, AZ 85023</td><td>4</td><td>582</td><td>Szechuan,Asian Fusion,Mexican,Chinese,Restaurants</td></tr>
+ <tr><td>Delux</td><td>http://www.yelp.com/biz/delux-phoenix</td><td>OFBJtqWGSx6n6CchtVmoRw</td><td>3146 E Camelback Rd,Phoenix, AZ 85016</td><td>4</td><td>568</td><td>Burgers,Bars,Nightlife,Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Without Heuristic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Golden Corral</td><td>http://www.yelp.com/biz/golden-corral-mesa</td><td>MpFziuV66BreNV1VMCYs9g</td><td>420 N Dysart Rd,Goodyear, AZ 85338</td><td>3</td><td>27</td><td>Buffets,Restaurants</td></tr>
+ <tr><td>Asahi Bakery</td><td>http://www.yelp.com/biz/asahi-bakery-phoenix</td><td>Tr3EsurgHqGPTXwAfjZ04Q</td><td>6056 N 16th St,Phoenix, AZ 85016</td><td>4</td><td>16</td><td>Bakeries,Food</td></tr>
+ <tr><td>Old Country Buffet</td><td>http://www.yelp.com/biz/old-country-buffet-glendale</td><td>SS073W0tN3nvG36Qy6n0qg</td><td>6625 E Southern Ave,Mesa, AZ 85206</td><td>3.5</td><td>13</td><td>Breakfast & Brunch,American (New),Buffets,Restaurants</td></tr>
+ <tr><td>Taylor's Cafe</td><td>http://www.yelp.com/biz/taylors-chowder-house-phoenix#query:Taylor%27s%20Cafe</td><td>UxvOXcoCRFRAVhRB0D9imw</td><td>5053 N 44th St,Phoenix, AZ 85018</td><td>3.5</td><td>76</td><td>Breakfast & Brunch,Restaurants</td></tr>
+ <tr><td>America's Taco Shop</td><td>http://www.yelp.com/biz/americas-taco-shop-phoenix</td><td>yzZxyhouOdM4NwYLEMgaWw</td><td>9261 E Via De Ventura,Ste 101,Scottsdale, AZ 85258</td><td>4</td><td>53</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>King Wah Express</td><td>http://www.yelp.com/biz/king-wah-express-glendale</td><td>VEDXuvU1gZy3PqD9q32uwQ</td><td>4306 W Northern Ave,Ste C,Glendale, AZ 85301</td><td>3.5</td><td>16</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>The Golden Door Spa & Cafe</td><td>http://www.yelp.com/biz/the-golden-door-spa-and-cafe-cave-creek</td><td>MoDHbrMoGnLhbMIGgZZOwQ</td><td>34631 N Tom Darlington Dr,Cave Creek, AZ 85377</td><td>4.5</td><td>12</td><td>Day Spas,Beauty & Spas</td></tr>
+ <tr><td>Pointe In Tyme</td><td>http://www.yelp.com/biz/pointe-in-tyme-phoenix</td><td>Y3a3RkR97J_ReiKgiMXeJg</td><td>11111 N 7th St,Phoenix, AZ 85020</td><td>3</td><td>42</td><td>Breakfast & Brunch,Restaurants</td></tr>
+ <tr><td>Siamese Kitchen</td><td>http://www.yelp.com/biz/siamese-kitchen-glendale</td><td>XguGFMUSEMz4wx_2G-otyA</td><td>4352 W Olive Ave,Glendale, AZ 85302</td><td>4</td><td>42</td><td>Thai,Restaurants</td></tr>
+ <tr><td>Guanaquito</td><td>http://www.yelp.com/biz/guanaquito-phoenix</td><td>rbiRLiFTG098z9JaK3Nshw</td><td>1434 E McDowell Rd,Phoenix, AZ 85006</td><td>4</td><td>47</td><td>Latin American,Mexican,Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Free Text with Heuristic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Search Term: burrito mexican</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Four Peaks Brewing Co</td><td>http://www.yelp.com/biz/four-peaks-brewing-co-tempe-2</td><td>JokKtdXU7zXHcr20Lrk29A</td><td>1340 E 8th St,Ste 104,Tempe, AZ 85281</td><td>4.5</td><td>956</td><td>Bars,Food,Breweries,Pubs,Nightlife,American (New),Restaurants</td></tr>
+ <tr><td>Cornish Pasty Company</td><td>http://www.yelp.com/biz/cornish-pasty-co-scottsdale</td><td>WNy1uzcmm_UHmTyR--o5IA</td><td>960 W University Dr,Tempe, AZ 85281</td><td>4.5</td><td>794</td><td>Pubs,Bars,Nightlife,British,Restaurants</td></tr>
+ <tr><td>Liberty Market</td><td>http://www.yelp.com/biz/liberty-market-gilbert</td><td>L9UYbtAUOcfTgZFimehlXw</td><td>230 N Gilbert Rd,Gilbert, AZ 85234</td><td>4.5</td><td>523</td><td>Food,Coffee & Tea,American (New),Restaurants</td></tr>
+ <tr><td>Cornish Pasty Company</td><td>http://www.yelp.com/biz/cornish-pasty-co-scottsdale</td><td>vARjqeIkSNsazHltujiq4Q</td><td>1941 W Guadalupe Rd,Ste 101,Mesa, AZ 85202</td><td>4.5</td><td>506</td><td>British,Restaurants</td></tr>
+ <tr><td>La Santisima Gourmet Taco Shop</td><td>http://www.yelp.com/biz/la-santisima-gourmet-taco-shop-phoenix</td><td>zp713qNhx8d9KCJJnrw1xA</td><td>1919 N 16th St,Phoenix, AZ 85006</td><td>4.5</td><td>435</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>FEZ</td><td>http://www.yelp.com/biz/fez-phoenix</td><td>EWMwV5V9BxNs_U6nNVMeqw</td><td>3815 N Central Ave,Phoenix, AZ 85012</td><td>4</td><td>911</td><td>Bars,Mediterranean,Nightlife,Lounges,American (New),Restaurants</td></tr>
+ <tr><td>Gallo Blanco</td><td>http://www.yelp.com/biz/gallo-blanco-phoenix</td><td>#NAME?</td><td>401 W Clarendon Ave,Phoenix, AZ 85013</td><td>4</td><td>731</td><td>Bars,Cafes,Nightlife,Restaurants</td></tr>
+ <tr><td>Matt's Big Breakfast</td><td>http://www.yelp.com/biz/matts-big-breakfast-phoenix-2</td><td>ntN85eu27C04nwyPa8IHtw</td><td>801 N 1st St,Phoenix, AZ 85004</td><td>4</td><td>724</td><td>Breakfast & Brunch,Restaurants</td></tr>
+ <tr><td>Joe's Farm Grill</td><td>http://www.yelp.com/biz/joes-farm-grill-gilbert</td><td>QnAzW6KMSciUcuJ20oI3Bw</td><td>3000 E Ray Rd,Bldg 1,Gilbert, AZ 85296</td><td>4</td><td>678</td><td>American (Traditional),Restaurants</td></tr>
+ <tr><td>St Francis Restaurant</td><td>http://www.yelp.com/biz/st-francis-restaurant-phoenix</td><td>uKSX1n1RoAzGq4bV8GPHVg</td><td>111 E Camelback Rd,Phoenix, AZ 85012</td><td>4</td><td>668</td><td>American (New),Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Without Heuristic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Taco Nazo</td><td>http://www.yelp.com/biz/taco-nazo-tempe</td><td>3uKAHQr19vFUfBJuXdmhEA</td><td>1405 W Southern Ave,Tempe, AZ 85282</td><td>3</td><td>30</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>Taco Bell</td><td>http://www.yelp.com/biz/taco-bell-scottsdale-6</td><td>lEpLxSA35gbmV6VwJ64wVw</td><td>7233 S. 51st Avenue,Laveen, AZ 85339</td><td>3</td><td>7</td><td>Fast Food,Mexican,Tex-Mex,Restaurants</td></tr>
+ <tr><td>Taylor's Cafe</td><td>http://www.yelp.com/biz/taylors-cafe-scottsdale</td><td>UxvOXcoCRFRAVhRB0D9imw</td><td>5053 N 44th St,Phoenix, AZ 85018</td><td>3.5</td><td>76</td><td>Breakfast & Brunch,Restaurants</td></tr>
+ <tr><td>Giant Coffee</td><td>http://www.yelp.com/biz/giant-coffee-phoenix</td><td>CdqTxe171tKTOkk8T15GGA</td><td>1437 N 1st St,Phoenix, AZ 85004</td><td>4</td><td>173</td><td>Food,Coffee & Tea</td></tr>
+ <tr><td>Dos Gringos</td><td>http://www.yelp.com/biz/dos-gringos-chandler-2</td><td>RqbSeoeqXTwts5pfhw7nJg</td><td>1361 N Alma School Rd,Chandler, AZ 85224</td><td>3.5</td><td>48</td><td>Bars,Mexican,Nightlife,Restaurants</td></tr>
+ <tr><td>Tortas Ahogadas Guadalajara</td><td>http://www.yelp.com/biz/tortas-ahogadas-guadalajara-chandler</td><td>jDyn5GnMiWllhB7qDpzltw</td><td>518 N Arizona Ave,Chandler, AZ 85225</td><td>4.5</td><td>23</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>Valle Luna</td><td>http://www.yelp.com/biz/valle-luna-phoenix</td><td>E3RjJH45EX6rHYDs0TYSRA</td><td>3336 W Bell Rd,Phoenix, AZ 85053</td><td>3.5</td><td>130</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>Chipotle Mexican Grill</td><td>http://www.yelp.com/biz/chipotle-mexican-grill-scottsdale-8</td><td>UCjtaUCtJPbTUouHtQURvQ</td><td>15425 N Scottsdale Rd,Scottsdale, AZ 85254</td><td>3.5</td><td>45</td><td>Tex-Mex,Restaurants</td></tr>
+ <tr><td>La Barquita</td><td>http://www.yelp.com/biz/la-barquita-phoenix</td><td>xdv2kvaZodkWvTSV6pSSpA</td><td>2334 E McDowell Rd,Phoenix, AZ 85006</td><td>4</td><td>41</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>Juan Jaime's</td><td>http://www.yelp.com/biz/juan-jaimes-chandler</td><td>ObYf1kZVWfL8NocxUwGJKg</td><td>2510 W Chandler Blvd,Ste 1,Chandler, AZ 85224</td><td>3.5</td><td>86</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Search Term:thai peanut noodle</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Four Peaks Brewing Co</td><td>http://www.yelp.com/biz/four-peaks-brewing-co-tempe-2</td><td>JokKtdXU7zXHcr20Lrk29A</td><td>1340 E 8th St,Ste 104,Tempe, AZ 85281</td><td>4.5</td><td>956</td><td>Bars,Food,Breweries,Pubs,Nightlife,American (New),Restaurants</td></tr>
+ <tr><td>Green</td><td>http://www.yelp.com/biz/green-tempe#query:Green</td><td>c1yGkETheht_1vjda7G5sA</td><td>2240 N Scottsdale Rd,Tempe, AZ 85281</td><td>4.5</td><td>599</td><td>Vegetarian,Vegan,Restaurants</td></tr>
+ <tr><td>FEZ</td><td>http://www.yelp.com/biz/fez-phoenix</td><td>EWMwV5V9BxNs_U6nNVMeqw</td><td>3815 N Central Ave,Phoenix, AZ 85012</td><td>4</td><td>911</td><td>Bars,Mediterranean,Nightlife,Lounges,American (New),Restaurants</td></tr>
+ <tr><td>Joe's Farm Grill</td><td>http://www.yelp.com/biz/joes-farm-grill-gilbert</td><td>QnAzW6KMSciUcuJ20oI3Bw</td><td>3000 E Ray Rd,Bldg 1,Gilbert, AZ 85296</td><td>4</td><td>678</td><td>American (Traditional),Restaurants</td></tr>
+ <tr><td>Hula's Modern Tiki</td><td>http://www.yelp.com/biz/hulas-modern-tiki-phoenix</td><td>_FXql6eVhbM923RdCi94SA</td><td>4700 N Central Ave,Phoenix, AZ 85012</td><td>4</td><td>595</td><td>Seafood,Caribbean,Hawaiian,Restaurants</td></tr>
+ <tr><td>True Food Kitchen</td><td>http://www.yelp.com/biz/true-food-kitchen-phoenix</td><td>qjmCVYkwP-HDa35jwYucbQ</td><td>2502 E Camelback Rd,Phoenix, AZ 85016</td><td>4</td><td>560</td><td>Vegetarian,American (New),Salad,Restaurants</td></tr>
+ <tr><td>FnB</td><td>http://www.yelp.com/biz/fnb-scottsdale</td><td>IuAPYzf3NSyfyXYgT46YVA</td><td>7125 E 5th Ave,Ste 31,Scottsdale, AZ 85251</td><td>4.5</td><td>269</td><td>Gastropubs,American (New),Restaurants</td></tr>
+ <tr><td>Cherryblossom Noodle Cafe</td><td>http://www.yelp.com/biz/cherryblossom-noodle-cafe-phoenix</td><td>AkOruz5CrCxUmXe1p_WoRg</td><td>914 E Camelback Rd,Phoenix, AZ 85014</td><td>4</td><td>435</td><td>Asian Fusion,Italian,Japanese,Restaurants</td></tr>
+ <tr><td>Cowboy Ciao</td><td>http://www.yelp.com/biz/cowboy-ciao-scottsdale</td><td>FV0BkoGOd3Yu_eJnXY15ZA</td><td>7133 E Stetson Dr,Ste 1,Scottsdale, AZ 85251</td><td>4</td><td>430</td><td>American (New),Restaurants</td></tr>
+ <tr><td>Green New American Vegetarian</td><td>http://www.yelp.com/biz/green-new-american-vegetarian-phoenix</td><td>0dORc6ckZw5HezR3BuSsqw</td><td>2022 N 7th St,Phoenix, AZ 85004</td><td>4.5</td><td>212</td><td>Vegetarian,Vegan,Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Without Heuristic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Sala Thai</td><td>http://www.yelp.com/biz/sala-thai-phoenix</td><td>WPmamMTGAmNYXGoXW1mWyQ</td><td>10880 N 32nd St,Ste 29,Phoenix, AZ 85028</td><td>4</td><td>122</td><td>Thai,Restaurants</td></tr>
+ <tr><td>Mango Thai</td><td>http://www.yelp.com/biz/mango-thai-mesa</td><td>joxWCp6dgN-kTE9GMziwjA</td><td>1440 S Country Club Dr,Ste 10,Mesa, AZ 85210</td><td>3</td><td>31</td><td>Thai,Restaurants</td></tr>
+ <tr><td>Thai Rama</td><td>http://www.yelp.com/biz/thai-rama-tempe</td><td>1621ir5mjVgbHwxCbMAEjg</td><td>927 E University Dr,Tempe, AZ 85281</td><td>3</td><td>67</td><td>Thai,Restaurants</td></tr>
+ <tr><td>Gourmet House of Hong Kong</td><td>http://www.yelp.com/biz/gourmet-house-of-hong-kong-phoenix</td><td>ykfTh6HI219NoMsWBxulxw</td><td>1438 E McDowell Rd,Phoenix, AZ 85006</td><td>3.5</td><td>75</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Bootleggers Modern American Smokehouse</td><td>http://www.yelp.com/biz/bootleggers-modern-american-smokehouse-phoenix</td><td>uMxfxbqT27XDeU9UTXeErg</td><td>3375 E Shea Blvd,Phoenix, AZ 85028</td><td>4</td><td>122</td><td>Bars,American (Traditional),Nightlife,Barbeque,Restaurants</td></tr>
+ <tr><td>Thai Gourmet</td><td>http://www.yelp.com/biz/thai-gourmet-avondale</td><td>3rqoxOasrRKxNubxjLSElA</td><td>10575 W Indian School Rd,Ste 101,Avondale, AZ 85392</td><td>4.5</td><td>23</td><td>Thai,Restaurants</td></tr>
+ <tr><td>Thai Patio</td><td>http://www.yelp.com/biz/thai-patio-mesa-4#query:Thai%20Patio</td><td>wzuIHNOJrxSwfhKt-wV1TA</td><td>1929 N Power Rd,Mesa, AZ 85207</td><td>4</td><td>45</td><td>Thai,Restaurants</td></tr>
+ <tr><td>Siamese Kitchen</td><td>http://www.yelp.com/biz/siamese-kitchen-glendale</td><td>XguGFMUSEMz4wx_2G-otyA</td><td>4352 W Olive Ave,Glendale, AZ 85302</td><td>4</td><td>42</td><td>Thai,Restaurants</td></tr>
+ <tr><td>Fate 905</td><td>http://www.yelp.com/biz/fate-905-phoenix</td><td>VsO_rhXi5lgbaGxNwoEZsQ</td><td>905 N 4th St,Phoenix, AZ 85004</td><td>3</td><td>90</td><td>Asian Fusion,Chinese,Restaurants</td></tr>
+ <tr><td>CafÃ© Monarch</td><td>http://www.yelp.com/biz/caf%C3%A9-monarch-scottsdale-4</td><td>L-uPZxooP_ziXCtRrWi8Pw</td><td>6934 E 1st Ave,Scottsdale, AZ 85251</td><td>4.5</td><td>206</td><td>American (New),Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Phrase Search With Herustic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Search Term:"Chinese Food"</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Chino Bandido</td><td>http://www.yelp.com/biz/chino-bandido-phoenix-3</td><td>Zx8_4zKdDBSO3qGrkukBIA</td><td>15414 N 19th Ave,Ste K,Phoenix, AZ 85023</td><td>4</td><td>582</td><td>Szechuan,Asian Fusion,Mexican,Chinese,Restaurants</td></tr>
+ <tr><td>China Magic Noodle House</td><td>http://www.yelp.com/biz/china-magic-noodle-house-chandler</td><td>jfDBaBgwINrGYAo8p2MJ4g</td><td>2015 N Dobson Rd,Chandler, AZ 85224</td><td>4</td><td>208</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Chino Bandido</td><td>http://www.yelp.com/biz/chino-bandido-chandler</td><td>Lnohr9bpCbHNsomazXDg-w</td><td>1825 W Chandler Blvd,Chandler, AZ 85224</td><td>3.5</td><td>281</td><td>Asian Fusion,Mexican,Chinese,Restaurants</td></tr>
+ <tr><td>Jasmine Tokyo</td><td>http://www.yelp.com/biz/jasmine-tokyo-scottsdale</td><td>1sNa5oW9ZYX8MbMFkx9LzQ</td><td>7000 E Shea Blvd,Scottsdale, AZ 85254</td><td>4</td><td>134</td><td>Bars,Asian Fusion,Buffets,Nightlife,Restaurants</td></tr>
+ <tr><td>Dilly's Deli</td><td>http://www.yelp.com/biz/dillys-deli-tempe</td><td>bF7KQ6AQK5rBS7aOFKtlWg</td><td>3330 S Price Rd,Ste 101,Tempe, AZ 85282</td><td>4.5</td><td>66</td><td>Delis,Sandwiches,Salad,Restaurants</td></tr>
+ <tr><td>Big Buddha</td><td>http://www.yelp.com/biz/big-buddha-surprise</td><td>mjoxSQR7bFQtlIIjfNfaSQ</td><td>16572 W Greenway Rd,Ste 115,Surprise, AZ 85388</td><td>4</td><td>104</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Great Wall Cuisine</td><td>http://www.yelp.com/biz/great-wall-cuisine-phoenix</td><td>0db71MbrvcJnyk71COCJBg</td><td>5057 N 35th Ave,Phoenix, AZ 85017</td><td>3.5</td><td>156</td><td>Dim Sum,Chinese,Restaurants</td></tr>
+ <tr><td>Noodle & Rice</td><td>http://www.yelp.com/biz/noodle-and-rice-phoenix</td><td>JPRyCrWPIo_ujOszH1NRzg</td><td>2017 E Cactus Rd,Ste G,Phoenix, AZ 85022</td><td>4</td><td>80</td><td>Thai,Chinese,Restaurants</td></tr>
+ <tr><td>Thai Hut</td><td>http://www.yelp.com/biz/thai-hut-phoenix</td><td>oJpmYvLibGrYPDvcaUeMOw</td><td>101 E McDowell Rd,Phoenix, AZ 85004</td><td>3.5</td><td>149</td><td>Thai,Restaurants</td></tr>
+ <tr><td>Miu's Cuisine</td><td>http://www.yelp.com/biz/mius-cuisine-tempe</td><td>Az_IY3TgnOcnh1dXd7GZLg</td><td>2314 E Apache Blvd,Tempe, AZ 85281</td><td>4</td><td>75</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Without Heuristic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Pick Up Stix</td><td>http://www.yelp.com/biz/pick-up-stix-scottsdale</td><td>T_d9GB_p0ajNTVEZ2CMmrw</td><td>4030 W Ray Rd,Chandler, AZ 85226</td><td>3</td><td>4</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>China Inn</td><td>http://www.yelp.com/biz/china-inn-phoenix</td><td>4l3eeM1sOACwdJAz4UyIPQ</td><td>3 S 2nd St,Phoenix, AZ 85004</td><td>2</td><td>3</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Pacific Seafood Buffet</td><td>http://www.yelp.com/biz/pacific-seafood-buffet-chandler</td><td>KpCKaIDZ1m4bQj2ur3olfg</td><td>3110 N Arizona Ave,Chandler, AZ 85225</td><td>3.5</td><td>114</td><td>Buffets,Restaurants</td></tr>
+ <tr><td>Best Hong Kong Dining</td><td>http://www.yelp.com/biz/best-hong-kong-dining-mesa</td><td>8TGUK7LD3M-vLWml-jLb0w</td><td>1116 S Dobson Rd,Ste 123,Mesa, AZ 85202</td><td>3.5</td><td>49</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Hunan Garden</td><td>http://www.yelp.com/biz/hunan-garden-chandler</td><td>VDLQNhp695jcwTvMFi8W5g</td><td>1940 W Chandler Blvd,Ste 1,Chandler, AZ 85224</td><td>4</td><td>3</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>A A Wok</td><td>http://www.yelp.com/biz/a-a-wok-phoenix</td><td>cuxqnMMmbBV0iE2KJJy60Q</td><td>3202 E Greenway Rd,Ste 1289,Phoenix, AZ 85032</td><td>3.5</td><td>4</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>George and Sons</td><td>http://www.yelp.com/biz/george-and-sons-phoenix</td><td>m2M7X5ItFvhOC7a6B7JcDg</td><td>3049 W Agua Fria Fwy,Phoenix, AZ 85027</td><td>4.5</td><td>30</td><td>Asian Fusion,Restaurants</td></tr>
+ <tr><td>Grand Buffet</td><td>http://www.yelp.com/biz/grand-buffet-apache-junction</td><td>u2hGxSbpIOZZ3KliIELuTQ</td><td>2430 W Apache Trl,Apache Junction, AZ 85220</td><td>2.5</td><td>6</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>The Wok Express</td><td>http://www.yelp.com/biz/the-wok-express-phoenix</td><td>AYAb0qJX5wuT2sRtz4CjpA</td><td>4835 E Greenway Rd,Phoenix, AZ 85034</td><td>4</td><td>18</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Lily Bowl Chinese Bistro</td><td>http://www.yelp.com/biz/lily-bowl-chinese-bistro-gilbert</td><td>B-WxQYb3A9SKyGm2aqk9tg</td><td>785 W Warner Rd,A# 103,Gilbert, AZ 85233</td><td>2.5</td><td>4</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Search Term:"good chinese food"</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>China Magic Noodle House</td><td>http://www.yelp.com/biz/china-magic-noodle-house-chandler</td><td>jfDBaBgwINrGYAo8p2MJ4g</td><td>2015 N Dobson Rd,Chandler, AZ 85224</td><td>4</td><td>208</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Tao Garden</td><td>http://www.yelp.com/biz/tao-garden-chandler</td><td>hrOsdyai-9B91cGjBspHqw</td><td>2050 N Alma School Rd,Chandler, AZ 85224</td><td>4</td><td>54</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>The Prime Chinese Restaurant</td><td>http://www.yelp.com/biz/the-prime-chinese-restaurant-phoenix</td><td>1vYaGPKQzMebBJXFCGTH2g</td><td>24 W Camelback Rd,Ste H,Phoenix, AZ 85013</td><td>4</td><td>50</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Wahsun Chinese Restaurant</td><td>http://www.yelp.com/biz/wahsun-chinese-restaurant-phoenix</td><td>dxAlupwjiQH91m4cE9a17g</td><td>8056 N 19th Ave,Phoenix, AZ 85021</td><td>3.5</td><td>53</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>J & M Chinese Cuisine Restaurant</td><td>http://www.yelp.com/biz/j-and-m-chinese-cuisine-restaurant-mesa</td><td>xhwp_bACX0017Qxu8_AVbw</td><td>1035 N Ellsworth Rd,Mesa, AZ 85207</td><td>4</td><td>24</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Buster's On the Lake</td><td>http://www.yelp.com/biz/busters-on-the-lake-scottsdale</td><td>UVBPF4oYrb0QfgW_DMbLPg</td><td>8320 N Hayden Rd,Ste 100,Scottsdale, AZ 85258</td><td>3.5</td><td>37</td><td>Seafood,American (Traditional),Restaurants</td></tr>
+ <tr><td>Little Shanghai</td><td>http://www.yelp.com/biz/little-shanghai-phoenix</td><td>BicQSnGZnY_yuGEDkhVfnA</td><td>4017 E Indian School Rd,Phoenix, AZ 85018</td><td>3.5</td><td>31</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>The Wok Express</td><td>http://www.yelp.com/biz/the-wok-express-phoenix</td><td>AYAb0qJX5wuT2sRtz4CjpA</td><td>4835 E Greenway Rd,Phoenix, AZ 85034</td><td>4</td><td>18</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Bashas'</td><td>http://www.yelp.com/biz/bashas-chandler</td><td>kOK86MUuK-VWfJEYuvHUnQ</td><td>1920 W Chandler Boulevard,Chandler, AZ 85224</td><td>3.5</td><td>14</td><td>Food,Grocery</td></tr>
+ <tr><td>Rice Garden</td><td>http://www.yelp.com/biz/rice-garden-scottsdale</td><td>08eBj_o6oTncJR0ylM8qSg</td><td>8053 E Indian School Rd,Scottsdale, AZ 85251</td><td>4</td><td>9</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Without Heuristic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Buster's On the Lake</td><td>http://www.yelp.com/biz/busters-on-the-lake-scottsdale</td><td>UVBPF4oYrb0QfgW_DMbLPg</td><td>8320 N Hayden Rd,Ste 100,Scottsdale, AZ 85258</td><td>3.5</td><td>37</td><td>Seafood,American (Traditional),Restaurants</td></tr>
+ <tr><td>Rice Garden</td><td>http://www.yelp.com/biz/rice-garden-scottsdale</td><td>08eBj_o6oTncJR0ylM8qSg</td><td>8053 E Indian School Rd,Scottsdale, AZ 85251</td><td>4</td><td>9</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Bashas'</td><td>http://www.yelp.com/biz/bashas-chandler</td><td>kOK86MUuK-VWfJEYuvHUnQ</td><td>1920 W Chandler Boulevard,Chandler, AZ 85224</td><td>3.5</td><td>14</td><td>Food,Grocery</td></tr>
+ <tr><td>The Prime Chinese Restaurant</td><td>http://www.yelp.com/biz/the-prime-chinese-restaurant-phoenix</td><td>1vYaGPKQzMebBJXFCGTH2g</td><td>24 W Camelback Rd,Ste H,Phoenix, AZ 85013</td><td>4</td><td>50</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Little Shanghai</td><td>http://www.yelp.com/biz/little-shanghai-phoenix</td><td>BicQSnGZnY_yuGEDkhVfnA</td><td>4017 E Indian School Rd,Phoenix, AZ 85018</td><td>3.5</td><td>31</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Davang Coffee Shop</td><td>http://www.yelp.com/biz/davang-coffee-shop-phoenix</td><td>peEtKzZhsQrQgBcrEXyBPQ</td><td>4538 N 19th Ave,Phoenix, AZ 85015</td><td>4.5</td><td>7</td><td>Food,Coffee & Tea</td></tr>
+ <tr><td>Jade Palace</td><td>http://www.yelp.com/biz/jade-palace-scottsdale-2</td><td>jpgmMTN__BHg_lnJEUjM-g</td><td>8120 N Hayden Rd,Scottsdale, AZ 85258</td><td>4.5</td><td>7</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Wahsun Chinese Restaurant</td><td>http://www.yelp.com/biz/wahsun-chinese-restaurant-phoenix</td><td>dxAlupwjiQH91m4cE9a17g</td><td>8056 N 19th Ave,Phoenix, AZ 85021</td><td>3.5</td><td>53</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>J & M Chinese Cuisine Restaurant</td><td>http://www.yelp.com/biz/j-and-m-chinese-cuisine-restaurant-mesa</td><td>xhwp_bACX0017Qxu8_AVbw</td><td>1035 N Ellsworth Rd,Mesa, AZ 85207</td><td>4</td><td>24</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>Tao Garden</td><td>http://www.yelp.com/biz/tao-garden-chandler</td><td>hrOsdyai-9B91cGjBspHqw</td><td>2050 N Alma School Rd,Chandler, AZ 85224</td><td>4</td><td>54</td><td>Chinese,Restaurants</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Search Term: "nice wine bar"</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Oregano's Pizza Bistro</td><td>http://www.yelp.com/biz/oreganos-pizza-bistro-tempe</td><td>LMG0zsAkUSscIvmV9vvm3A</td><td>7215 E Shea Blvd,Scottsdale, AZ 85260</td><td>4</td><td>212</td><td>Pizza,Restaurants</td></tr>
+ <tr><td>VinciTorio's Restaurant</td><td>http://www.yelp.com/biz/vincitorios-restaurant-tempe</td><td>MPyxaNVuWlAQqJ0iKV5rQw</td><td>1835 E Elliot Rd,Ste C109,Tempe, AZ 85284</td><td>4</td><td>144</td><td>Restaurants,Buffets,Italian</td></tr>
+ <tr><td>Firebirds Wood Fired Grill</td><td>http://www.yelp.com/biz/firebirds-wood-fired-grill-chandler</td><td>8dEJ_o0UgGrNX1ejHcuZjA</td><td>16067 N Arrowhead Fountains Center Dr,Peoria, AZ 85382</td><td>4</td><td>90</td><td>Steakhouses,American (Traditional),Restaurants</td></tr>
+ <tr><td>Elite Event: Screw Your Resolutions at Salty Sow</td><td>http://fi.yelp.fi/biz/elite-event-screw-your-resolutions-at-salty-sow-scottsdale</td><td>mchiTm_e8xRXPf2SWMJbkQ</td><td>Salty Sow,4801 E Cactus Rd,Scottsdale, AZ 85254</td><td>5</td><td>19</td><td>Yelp Events,Local Flavor</td></tr>
+ <tr><td>Las Fuentes Mexican Grill</td><td>http://www.yelp.com/biz/las-fuentes-mexican-grill-surprise</td><td>H92SaE8QEFyQHjwYEcCCCw</td><td>13621 N Litchfield Rd,Surprise, AZ 85374</td><td>3.5</td><td>61</td><td>Mexican,Restaurants</td></tr>
+ <tr><td>Teatro Pizzeria and Wine Bar</td><td>http://www.yelp.com/biz/fresh-and-easy-neighborhood-market-torrance-2</td><td>lrxoQH8u2X-XpQ38PLAgTQ</td><td>32409 N Scottsdale Rd,Scottsdale, AZ 85266</td><td>4</td><td>28</td><td>Restaurants,Pizza,Italian</td></tr>
+ <tr><td>Wine Warehouse</td><td>http://www.yelp.com/biz/fresh-and-easy-neighborhood-market-torrance-2</td><td>DiDZqjm_ti1Kim-5BhHPfA</td><td>17025 N Scottsdale Rd,Ste 140,Scottsdale, AZ 85255</td><td>5</td><td>11</td><td>Food,Beer, Wine & Spirits</td></tr>
+ <tr><td>Fresh & Easy Neighborhood Market</td><td>http://www.yelp.com/biz/fresh-and-easy-neighborhood-market-torrance-2</td><td>s0Xpzb2GzBILFAKMpAtspQ</td><td>1537 S. Higley Rd,Gilbert, AZ 85296</td><td>4</td><td>16</td><td>Food,Bakeries,Grocery,Convenience Stores</td></tr>
+ <tr><td>Bar Maximus</td><td>http://www.yelp.com/biz/bar-maximus-phoenix</td><td>4MZBPKr4Kmw_5hiElostjw</td><td>214 W Roosevelt St,Phoenix, AZ 85003</td><td>3.5</td><td>19</td><td>Bars,Food,Beer, Wine & Spirits,Wine Bars,Nightlife,Gastropubs,Restaurants</td></tr>
+ <tr><td>Raimondo's</td><td>http://www.yelp.com/biz/raimondos-phoenix</td><td>MEraJIKYztC7IOzYwMe86g</td><td>502 W Camelback,Phoenix, AZ 85013</td><td>3.5</td><td>16</td><td>Restaurants,Pizza,Italian</td></tr>
+ <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Without Heuristic</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+ <tr><td>Wine Warehouse</td><td>http://www.yelp.com/biz/wine-warehouse-scottsdale</td><td>DiDZqjm_ti1Kim-5BhHPfA</td><td>17025 N Scottsdale Rd,Ste 140,Scottsdale, AZ 85255</td><td>5</td><td>11</td><td>Food,Beer, Wine & Spirits</td></tr>
+ <tr><td>Fresh & Easy Neighborhood Market</td><td>http://www.yelp.com/biz/fresh-and-easy-neighborhood-market-torrance-2</td><td>s0Xpzb2GzBILFAKMpAtspQ</td><td>1537 S. Higley Rd,Gilbert, AZ 85296</td><td>4</td><td>16</td><td>Food,Bakeries,Grocery,Convenience Stores</td></tr>
+ <tr><td>Hyatt Place Tempe/Phoenix Airport</td><td>http://www.yelp.com/biz/hyatt-place-tempe-phoenix-airport-tempe</td><td>OECFqFDCDuqF8qWngIEJeA</td><td>1413 W Rio Salado Pkwy,Tempe, AZ 85281</td><td>3.5</td><td>15</td><td>Hotels & Travel,Event Planning & Services,Hotels</td></tr>
+ <tr><td>Banzai Cowboy Sushi & Martini Bar</td><td>http://www.yelp.com/biz/banzai-cowboy-sushi-and-martini-bar-scottsdale</td><td>xxYiSZgmwE-9-quy8kkHEQ</td><td>20715 N Pima Rd,Ste 110,Scottsdale, AZ 85255</td><td>3.5</td><td>7</td><td>Bars,Sushi Bars,Japanese,Nightlife,Lounges,Restaurants</td></tr>
+ <tr><td>Teatro Pizzeria and Wine Bar</td><td>http://www.yelp.com/biz/teatro-pizzeria-and-wine-bar-scottsdale-2</td><td>lrxoQH8u2X-XpQ38PLAgTQ</td><td>32409 N Scottsdale Rd,Scottsdale, AZ 85266</td><td>4</td><td>28</td><td>Restaurants,Pizza,Italian</td></tr>
+ <tr><td>Elite Event: Screw Your Resolutions at Salty Sow</td><td>http://www.yelp.com/biz/elite-event-screw-your-resolutions-at-salty-sow-scottsdale</td><td>mchiTm_e8xRXPf2SWMJbkQ</td><td>Salty Sow,4801 E Cactus Rd,Scottsdale, AZ 85254</td><td>5</td><td>19</td><td>Yelp Events,Local Flavor</td></tr>
+ <tr><td>Raimondo's</td><td>http://www.yelp.com/biz/raimondos-ship-bottom</td><td>MEraJIKYztC7IOzYwMe86g</td><td>502 W Camelback,Phoenix, AZ 85013</td><td>3.5</td><td>16</td><td>Restaurants,Pizza,Italian</td></tr>
+ <tr><td>Bar Maximus</td><td>http://www.yelp.com/biz/bar-maximus-phoenix</td><td>4MZBPKr4Kmw_5hiElostjw</td><td>214 W Roosevelt St,Phoenix, AZ 85003</td><td>3.5</td><td>19</td><td>Bars,Food,Beer, Wine & Spirits,Wine Bars,Nightlife,Gastropubs,Restaurants</td></tr>
+ <tr><td>VinciTorio's Restaurant</td><td>http://www.yelp.com/biz/vincitorios-restaurant-tempe</td><td>MPyxaNVuWlAQqJ0iKV5rQw</td><td>1835 E Elliot Rd,Ste C109,Tempe, AZ 85284</td><td>4</td><td>144</td><td>Restaurants,Buffets,Italian</td></tr>
+ <tr><td>Oregano's Pizza Bistro</td><td>http://www.yelp.com/biz/oreganos-pizza-bistro-tempe</td><td>LMG0zsAkUSscIvmV9vvm3A</td><td>7215 E Shea Blvd,Scottsdale, AZ 85260</td><td>4</td><td>212</td><td>Pizza,Restaurants</td></tr>
+</table>
+
+
+
+            
+
+            
+
 
             <!--  
             <h2></h2>
